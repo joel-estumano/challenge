@@ -3,8 +3,8 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import Icon from '@/components/Icon';
 import { ITicket } from '@/interfaces';
 import { Button } from '../ui/button';
-import { formatDate } from '@/lib/utils';
 import { StatusEnum } from '@/enums/status.enum';
+import { pipeDateTimeLabel } from '@/utils';
 
 interface ConfirmDeleteDialogProps {
 	ticket: ITicket;
@@ -45,7 +45,7 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({ ticket, onCon
 							<strong>Título:</strong> {ticket.title}
 						</DialogDescription>
 						<DialogDescription>
-							<strong>Última Atualização:</strong> {formatDate(ticket.updatedAt as StatusEnum)}
+							<strong>Última Atualização:</strong> {pipeDateTimeLabel(ticket.updatedAt as StatusEnum)}
 						</DialogDescription>
 					</DialogHeader>
 					<div className="mt-4 flex justify-end space-x-2">
