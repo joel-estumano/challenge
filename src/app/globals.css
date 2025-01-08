@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+	@apply font-montserrat;
+}
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+	:root {
+		--background: 210 8% 95%;
+		--foreground: 220 15% 20%;
+		--card: 0 0% 100%;
+		--card-foreground: 220 10% 15%;
+		--popover: 0 0% 100%;
+		--popover-foreground: 220 10% 15%;
+		--primary: 207 90% 54%; /* Azul Vibrante */
+		--primary-foreground: 0 0% 100%;
+		--secondary: 48 100% 50%; /* Amarelo Dourado */
+		--secondary-foreground: 220 15% 20%;
+		--muted: 210 8% 90%; /* Cinza Claro */
+		--muted-foreground: 220 10% 30%;
+		--accent: 260 100% 70%; /* Violeta */
+		--accent-foreground: 260 100% 100%; /* Branco */
+		--destructive: 0 84.2% 60.2%; /* Vermelho */
+		--destructive-foreground: 0 0% 100%;
+		--border: 220 10% 85%; /* Cinza Médio */
+		--input: 220 10% 85%; /* Cinza Médio */
+		--ring: 207 90% 54%; /* Azul Vibrante */
+		--chart-1: 220 70% 50%; /* Azul */
+		--chart-2: 160 60% 45%; /* Verde */
+		--chart-3: 30 80% 55%; /* Laranja */
+		--chart-4: 280 65% 60%; /* Roxo */
+		--chart-5: 340 75% 55%; /* Rosa */
+		--radius: 0.5rem;
+	}
+
+	.dark {
+		--background: 220 15% 10%;
+		--foreground: 0 0% 95%;
+		--card: 220 20% 15%;
+		--card-foreground: 0 0% 95%;
+		--popover: 220 20% 15%;
+		--popover-foreground: 0 0% 95%;
+		--primary: 207 90% 54%; /* Azul Vibrante */
+		--primary-foreground: 0 0% 100%;
+		--secondary: 48 100% 50%; /* Amarelo Dourado */
+		--secondary-foreground: 0 0% 95%;
+		--muted: 220 15% 20%; /* Cinza Escuro */
+		--muted-foreground: 0 0% 95%;
+		--accent: 260 100% 70%; /* Violeta */
+		--accent-foreground: 260 100% 100%; /* Branco */
+		--destructive: 0 84.2% 60.2%; /* Vermelho */
+		--destructive-foreground: 0 0% 100%;
+		--border: 220 10% 85%; /* Cinza Médio */
+		--input: 220 10% 85%; /* Cinza Médio */
+		--ring: 207 90% 54%; /* Azul Vibrante */
+		--chart-1: 220 70% 50%; /* Azul */
+		--chart-2: 160 60% 45%; /* Verde */
+		--chart-3: 30 80% 55%; /* Laranja */
+		--chart-4: 280 65% 60%; /* Roxo */
+		--chart-5: 340 75% 55%; /* Rosa */
+	}
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+}
