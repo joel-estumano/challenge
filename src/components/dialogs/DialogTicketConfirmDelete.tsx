@@ -3,6 +3,8 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import Icon from '@/components/Icon';
 import { ITicket } from '@/interfaces';
 import { Button } from '../ui/button';
+import { formatDate } from '@/lib/utils';
+import { StatusEnum } from '@/enums/status.enum';
 
 interface ConfirmDeleteDialogProps {
 	ticket: ITicket;
@@ -28,10 +30,23 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({ ticket, onCon
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Confirmar Exclusão</DialogTitle>
-						<DialogDescription></DialogDescription>
-						<p>
-							Você tem certeza que deseja excluir o ticket: <strong>{ticket.title}</strong>? Esta ação não pode ser desfeita.
-						</p>
+						<DialogDescription className="text-destructive font-semibold">
+							Você tem certeza que deseja excluir o ticket?
+							<br />
+							Esta ação não pode ser desfeita.
+						</DialogDescription>
+						<DialogDescription>
+							<strong>ID:</strong> {ticket._id}
+						</DialogDescription>
+						<DialogDescription>
+							<strong>Autor:</strong> {ticket.author}
+						</DialogDescription>
+						<DialogDescription>
+							<strong>Título:</strong> {ticket.title}
+						</DialogDescription>
+						<DialogDescription>
+							<strong>Última Atualização:</strong> {formatDate(ticket.updatedAt as StatusEnum)}
+						</DialogDescription>
 					</DialogHeader>
 					<div className="mt-4 flex justify-end space-x-2">
 						<Button type="button" variant="outline" onClick={() => setIsOpen(false)}>

@@ -64,7 +64,9 @@ const Dashboard: React.FC = () => {
 										<AccordionItem value={ticket._id as string} key={ticket._id}>
 											<AccordionTrigger>
 												<div className="flex justify-between pe-2 w-full">
-													<strong>{ticket.title}</strong>
+													<DialogTicketDetails ticket={ticket}>
+														<strong>{ticket.title}</strong>
+													</DialogTicketDetails>
 													<Badge
 														variant={getBadgeVariant(ticket.status)}
 														className="min-w-24 h-fit w-24 items-center justify-center flex"
@@ -135,7 +137,9 @@ const Dashboard: React.FC = () => {
 															{ticket.status}
 														</Badge>
 													</TableCell>
-													<TableCell className="px-2 py-2 text-xs sm:text-sm">{ticket.title}</TableCell>
+													<TableCell className="px-2 py-2 text-xs sm:text-sm">
+														<DialogTicketDetails ticket={ticket}>{ticket.title}</DialogTicketDetails>
+													</TableCell>
 													<TableCell className="px-2 py-2 text-xs sm:text-sm">{formatDate(ticket.updatedAt as StatusEnum)}</TableCell>
 													<TableCell className="px-2 py-2 text-xs sm:text-sm">
 														<div className="flex gap-2 sm:gap-4 items-center justify-end">
