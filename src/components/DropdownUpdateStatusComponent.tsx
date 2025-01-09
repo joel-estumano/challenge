@@ -16,7 +16,7 @@ interface DropdownUpdateStatusComponentProps {
 const DropdownUpdateStatusComponent: React.FC<DropdownUpdateStatusComponentProps> = ({ ticket }) => {
 	const dispatch = useDispatch<AppDispatch>();
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-	const [status, setStatus] = useState<StatusEnum>(ticket.status);
+	const [status, setStatus] = useState<StatusEnum>(ticket.status ?? StatusEnum.OPEN);
 	const [loading, setLoading] = useState<boolean>(false);
 
 	const handleUpdateStatus = async () => {
