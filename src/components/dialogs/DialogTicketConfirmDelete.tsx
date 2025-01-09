@@ -1,4 +1,4 @@
-import Icon from '@/components/Icon';
+import IconComponet from '@/components/IconComponet';
 import React, { useState } from 'react';
 import { AppDispatch, RootState } from '@/store';
 import { Button } from '../ui/button';
@@ -8,6 +8,7 @@ import { ITicket } from '@/interfaces';
 import { pipeDateTimeLabel } from '@/utils';
 import { StatusEnum } from '@/enums/status.enum';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'sonner';
 
 interface ConfirmDeleteDialogProps {
 	ticket: ITicket;
@@ -18,20 +19,27 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({ ticket }) => 
 	const { isLoading } = useSelector((state: RootState) => state.tickets);
 	const [isOpen, setIsOpen] = useState(false);
 
-	const handleConfirm = () => {
-		dispatch(deleteTicket(ticket._id as string));
-		setIsOpen(false);
+	const handleConfirm = async () => {
+		try {
+			await dispatch(deleteTicket(ticket._id as string));
+			toast.success('Ticket excluído com sucesso!');
+		} catch (error) {
+			console.error(error);
+			toast.error('Erro ao excluir o ticket.');
+		} finally {
+			setIsOpen(false);
+		}
 	};
 
 	return (
 		<>
 			<Dialog open={isOpen} onOpenChange={setIsOpen}>
 				<DialogTrigger asChild>
-					<Button type="button" variant="outline" title="Excluir" className="text-destructive p-2" onClick={() => setIsOpen(true)}>
-						<Icon name="Trash2" className="w-4 h-4" />
+					<Button type="button" variant="ghost" title="Excluir" className="text-destructive p-2" onClick={() => setIsOpen(true)}>
+						<IconComponet name="Trash2" className="w-4 h-4" />
 					</Button>
 				</DialogTrigger>
-				<DialogContent>
+				<DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
 					<DialogHeader>
 						<DialogTitle>Confirmar Exclusão</DialogTitle>
 						<DialogDescription className="text-destructive font-semibold">
@@ -39,18 +47,30 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({ ticket }) => 
 							<br />
 							Esta ação não pode ser desfeita.
 						</DialogDescription>
-						<DialogDescription>
-							<strong>ID:</strong> {ticket._id}
-						</DialogDescription>
-						<DialogDescription>
-							<strong>Autor:</strong> {ticket.author}
-						</DialogDescription>
-						<DialogDescription>
-							<strong>Título:</strong> {ticket.title}
-						</DialogDescription>
-						<DialogDescription>
-							<strong>Última Atualização:</strong> {pipeDateTimeLabel(ticket.updatedAt as StatusEnum)}
-						</DialogDescription>
+						<div className="mt-4">
+							<label htmlFor="ticketId" className="block text-sm font-medium text-gray-700">
+								ID
+							</label>
+							<DialogDescription id="ticketId">{ticket._id}</DialogDescription>
+						</div>
+						<div className="mt-2">
+							<label htmlFor="ticketAuthor" className="block text-sm font-medium text-gray-700">
+								Autor
+							</label>
+							<DialogDescription id="ticketAuthor">{ticket.author}</DialogDescription>
+						</div>
+						<div className="mt-2">
+							<label htmlFor="ticketTitle" className="block text-sm font-medium text-gray-700">
+								Título
+							</label>
+							<DialogDescription id="ticketTitle">{ticket.title}</DialogDescription>
+						</div>
+						<div className="mt-2">
+							<label htmlFor="ticketUpdated" className="block text-sm font-medium text-gray-700">
+								Última Atualização
+							</label>
+							<DialogDescription id="ticketUpdated">{pipeDateTimeLabel(ticket.updatedAt as StatusEnum)}</DialogDescription>
+						</div>
 					</DialogHeader>
 					<div className="mt-4 flex justify-end space-x-2">
 						<Button type="button" variant="outline" onClick={() => setIsOpen(false)}>

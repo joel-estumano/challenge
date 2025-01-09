@@ -6,8 +6,10 @@ import { StatusEnum } from '@/enums/status.enum';
 
 export const addTicketSuccess = createAction<{ ticket: ITicket }>('ADD_TICKET_SUCCESS');
 export const addTicketError = createAction<{ error: string }>('ADD_TICKET_ERROR');
+export const addTicketLoading = createAction('ADD_TICKET_LOADING');
 export const addTicket = createAsyncThunk('tickets/addTicket', async (ticket: ITicket, { dispatch }) => {
 	try {
+		dispatch(addTicketLoading());
 		const response = await api.post('/tickets', ticket);
 		dispatch(addTicketSuccess({ ticket: response.data }));
 	} catch (error) {
@@ -19,8 +21,10 @@ export const loadTickets = createAction<number>('LOAD_TICKETS');
 
 export const filterTicketsSuccess = createAction<{ data: TicketsPaginatedResult; status: StatusEnum[] }>('FILTER_TICKETS_SUCCESS');
 export const filterTicketsError = createAction<{ error: string }>('FILTER_TICKETS_ERROR');
+export const filterTicketsLoading = createAction('FILTER_TICKETS_LOADING');
 export const filterTickets = createAsyncThunk('tickets/filterTickets', async (status: StatusEnum, { dispatch }) => {
 	try {
+		dispatch(filterTicketsLoading());
 		const statusParams = status === StatusEnum.ALL ? [StatusEnum.OPEN, StatusEnum.PROGRESS, StatusEnum.DONE] : [status];
 		const response = await api.get(`/tickets?`, {
 			params: {
@@ -38,8 +42,10 @@ export const filterTickets = createAsyncThunk('tickets/filterTickets', async (st
 
 export const editTicketSuccess = createAction<{ ticket: ITicket }>('EDIT_TICKET_SUCCESS');
 export const editTicketError = createAction<{ error: string }>('EDIT_TICKET_ERROR');
+export const editTicketLoading = createAction('EDIT_TICKET_LOADING');
 export const editTicket = createAsyncThunk('tickets/editTicket', async (ticket: ITicket, { dispatch }) => {
 	try {
+		dispatch(editTicketLoading());
 		const response = await api.patch(`/tickets/${ticket._id}`, ticket);
 		dispatch(editTicketSuccess({ ticket: response.data }));
 	} catch (error) {
@@ -49,8 +55,10 @@ export const editTicket = createAsyncThunk('tickets/editTicket', async (ticket: 
 
 export const deleteTicketSuccess = createAction<{ id: string }>('DELETE_TICKET_SUCCESS');
 export const deleteTicketError = createAction<{ error: string }>('DELETE_TICKET_ERROR');
+export const deleteTicketLoading = createAction('DELETE_TICKET_LOADING');
 export const deleteTicket = createAsyncThunk('tickets/deleteTicket', async (id: string, { dispatch }) => {
 	try {
+		dispatch(deleteTicketLoading());
 		await api.delete(`/tickets/${id}`);
 		dispatch(deleteTicketSuccess({ id }));
 	} catch (error) {

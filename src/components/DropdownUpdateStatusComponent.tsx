@@ -9,11 +9,11 @@ import { StatusEnum } from '@/enums/status.enum';
 import { pipeStatusLabel } from '@/utils';
 import { ITicket } from '@/interfaces';
 
-interface UpdateStatusProps {
+interface DropdownUpdateStatusComponentProps {
 	ticket: ITicket;
 }
 
-const UpdateStatus: React.FC<UpdateStatusProps> = ({ ticket }) => {
+const DropdownUpdateStatusComponent: React.FC<DropdownUpdateStatusComponentProps> = ({ ticket }) => {
 	const dispatch = useDispatch<AppDispatch>();
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const [status, setStatus] = useState<StatusEnum>(ticket.status);
@@ -29,9 +29,17 @@ const UpdateStatus: React.FC<UpdateStatusProps> = ({ ticket }) => {
 	return (
 		<Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<PopoverTrigger asChild>
-				<div className="flex items-center gap-1 cursor-pointer text-[.6rem]">{pipeStatusLabel(ticket.status)}</div>
+				<div
+					className="flex items-center gap-1 cursor-pointer text-[.6rem] w-full justify-center"
+					onClick={(e) => {
+						e.stopPropagation();
+						setIsPopoverOpen((prev) => !prev);
+					}}
+				>
+					{pipeStatusLabel(ticket.status)}
+				</div>
 			</PopoverTrigger>
-			<PopoverContent className="p-4 w-42">
+			<PopoverContent className="p-4 w-42" onClick={(e) => e.preventDefault()}>
 				<div className="flex flex-col gap-2">
 					<Select name="status" value={status} onValueChange={setStatus}>
 						<SelectTrigger className="w-full">
@@ -56,4 +64,4 @@ const UpdateStatus: React.FC<UpdateStatusProps> = ({ ticket }) => {
 	);
 };
 
-export default UpdateStatus;
+export default DropdownUpdateStatusComponent;

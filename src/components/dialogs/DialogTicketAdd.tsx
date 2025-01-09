@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
-import { useDispatch } from 'react-redux';
-import { Button } from '../ui/button';
-import Icon from '../Icon';
-import { Input } from '../ui/input';
-import { AppDispatch } from '@/store';
-import { addTicket } from '@/store/tickets/tickets-actions';
-import { StatusEnum } from '@/enums/status.enum';
-import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import IconComponet from '../IconComponet';
+import React, { useState } from 'react';
+import { addTicket } from '@/store/tickets/tickets-actions';
+import { AppDispatch } from '@/store';
+import { Button } from '../ui/button';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
+import { Input } from '../ui/input';
+import { StatusEnum } from '@/enums/status.enum';
+import { useDispatch } from 'react-redux';
+import { useFormik } from 'formik';
+import { toast } from 'sonner';
 
 const DialogAddTicket: React.FC = () => {
 	const dispatch = useDispatch<AppDispatch>();
@@ -27,10 +28,17 @@ const DialogAddTicket: React.FC = () => {
 			author: Yup.string().required('Autor é obrigatório')
 		}),
 		onSubmit: async (values, { setSubmitting, resetForm }) => {
-			await dispatch(addTicket({ ...values, status }));
-			setSubmitting(false);
-			resetForm();
-			setIsDialogOpen(false);
+			try {
+				await dispatch(addTicket({ ...values, status }));
+				toast.success('Ticket adicionado com sucesso!');
+				resetForm();
+				setIsDialogOpen(false);
+			} catch (error) {
+				console.error(error);
+				toast.error('Erro ao adicionar o ticket.');
+			} finally {
+				setSubmitting(false);
+			}
 		}
 	});
 
@@ -38,22 +46,36 @@ const DialogAddTicket: React.FC = () => {
 		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 			<DialogTrigger asChild>
 				<Button type="button" className="flex items-center gap-1">
-					<Icon name="Plus" className="w-4 h-4" />
+					<IconComponet name="Plus" className="w-4 h-4" />
 					Ticket
 				</Button>
 			</DialogTrigger>
-			<DialogContent>
+			<DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
 				<DialogHeader>
-					<DialogTitle>Adicionar novo Ticket</DialogTitle>
+					<DialogTitle>Novo Ticket</DialogTitle>
 					<DialogDescription>Preencha os dados abaixo para adicionar um novo ticket.</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
 					<div>
-						<Input name="title" value={formik.values.title} onChange={formik.handleChange} onBlur={formik.handleBlur} placeholder="Título" />
+						<label htmlFor="title" className="block text-sm font-medium text-gray-700">
+							Título
+						</label>
+						<Input
+							id="title"
+							name="title"
+							value={formik.values.title}
+							onChange={formik.handleChange}
+							onBlur={formik.handleBlur}
+							placeholder="Título"
+						/>
 						{formik.touched.title && formik.errors.title ? <div className="text-red-500 text-xs ms-1">{formik.errors.title}</div> : null}
 					</div>
 					<div>
+						<label htmlFor="description" className="block text-sm font-medium text-gray-700">
+							Descrição
+						</label>
 						<Input
+							id="description"
 							name="description"
 							value={formik.values.description}
 							onChange={formik.handleChange}
@@ -65,15 +87,27 @@ const DialogAddTicket: React.FC = () => {
 						) : null}
 					</div>
 					<div>
-						<Input name="author" value={formik.values.author} onChange={formik.handleChange} onBlur={formik.handleBlur} placeholder="Autor" />
+						<label htmlFor="author" className="block text-sm font-medium text-gray-700">
+							Autor
+						</label>
+						<Input
+							id="author"
+							name="author"
+							value={formik.values.author}
+							onChange={formik.handleChange}
+							onBlur={formik.handleBlur}
+							placeholder="Autor"
+						/>
 						{formik.touched.author && formik.errors.author ? <div className="text-red-500 text-xs ms-1">{formik.errors.author}</div> : null}
 					</div>
-					<DialogFooter className="gap-2">
+					<DialogFooter className="gap-4 sm:gap-2 flex max-sm:flex-col-reverse">
 						<DialogClose asChild>
-							<Button variant="outline">Cancelar</Button>
+							<Button variant="outline" title="Cancelar">
+								Cancelar
+							</Button>
 						</DialogClose>
-						<Button type="submit" disabled={formik.isSubmitting || !formik.isValid}>
-							{formik.isSubmitting ? 'Enviando...' : 'Salvar'}
+						<Button type="submit" title="Salvar" disabled={formik.isSubmitting || !formik.isValid}>
+							{formik.isSubmitting ? 'Salvando...' : 'Salvar'}
 						</Button>
 					</DialogFooter>
 				</form>

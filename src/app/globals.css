@@ -12,25 +12,25 @@ body {
 
 @layer base {
 	:root {
-		--background: 210 8% 95%;
-		--foreground: 220 15% 20%;
-		--card: 0 0% 100%;
-		--card-foreground: 220 10% 15%;
-		--popover: 0 0% 100%;
-		--popover-foreground: 220 10% 15%;
-		--primary: 207 90% 54%; /* Azul Vibrante */
-		--primary-foreground: 0 0% 100%;
-		--secondary: 120 73% 47%; /* Verde Vibrante */
-		--secondary-foreground: 0 0% 100%; /* Branco */
-		--muted: 210 8% 90%; /* Cinza Claro */
-		--muted-foreground: 220 10% 30%;
-		--accent: 260 100% 70%; /* Violeta */
-		--accent-foreground: 260 100% 100%; /* Branco */
-		--destructive: 0 84.2% 60.2%; /* Vermelho */
-		--destructive-foreground: 0 0% 100%;
-		--border: 220 10% 85%; /* Cinza Médio */
-		--input: 220 10% 85%; /* Cinza Médio */
-		--ring: 207 90% 54%; /* Azul Vibrante */
+		--background: 220 15% 10%; /* Fundo bem escuro */
+		--foreground: 0 0% 100%; /* Texto branco */
+		--card: 220 15% 15%; /* Cartões levemente mais claros que o fundo */
+		--card-foreground: 0 0% 100%; /* Texto branco em cartões */
+		--popover: 220 15% 15%; /* Fundo do popover igual ao dos cartões */
+		--popover-foreground: 0 0% 100%; /* Texto branco no popover */
+		--primary: 207 90% 54%; /* Azul vibrante */
+		--primary-foreground: 0 0% 100%; /* Texto branco em botões primários */
+		--secondary: 120 73% 47%; /* Verde vibrante */
+		--secondary-foreground: 0 0% 100%; /* Texto branco em botões secundários */
+		--muted: 220 10% 20%; /* Cinza escuro para elementos atenuados */
+		--muted-foreground: 0 0% 80%; /* Texto cinza claro em elementos atenuados */
+		--accent: 260 100% 70%; /* Violeta vibrante */
+		--accent-foreground: 0 0% 100%; /* Texto branco em elementos de destaque */
+		--destructive: 0 84.2% 60.2%; /* Vermelho vibrante */
+		--destructive-foreground: 0 0% 100%; /* Texto branco em botões de ação destrutiva */
+		--border: 220 10% 30%; /* Bordas escuras */
+		--input: 220 10% 20%; /* Campos de entrada escuros */
+		--ring: 207 90% 54%; /* Azul vibrante para anéis de foco */
 		--chart-1: 220 70% 50%; /* Azul */
 		--chart-2: 160 60% 45%; /* Verde */
 		--chart-3: 30 80% 55%; /* Laranja */
@@ -40,30 +40,31 @@ body {
 	}
 
 	.dark {
-		--background: 220 15% 10%;
-		--foreground: 0 0% 95%;
-		--card: 220 20% 15%;
-		--card-foreground: 0 0% 95%;
-		--popover: 220 20% 15%;
-		--popover-foreground: 0 0% 95%;
-		--primary: 207 90% 54%; /* Azul Vibrante */
-		--primary-foreground: 0 0% 100%;
-		--secondary: 120 73% 47%; /* Verde Vibrante */
-		--secondary-foreground: 0 0% 100%; /* Branco */
-		--muted: 220 15% 20%; /* Cinza Escuro */
-		--muted-foreground: 0 0% 95%;
-		--accent: 260 100% 70%; /* Violeta */
-		--accent-foreground: 260 100% 100%; /* Branco */
-		--destructive: 0 84.2% 60.2%; /* Vermelho */
-		--destructive-foreground: 0 0% 100%;
-		--border: 220 10% 85%; /* Cinza Médio */
-		--input: 220 10% 85%; /* Cinza Médio */
-		--ring: 207 90% 54%; /* Azul Vibrante */
+		--background: 220 15% 10%; /* Fundo bem escuro */
+		--foreground: 0 0% 100%; /* Texto branco */
+		--card: 220 15% 15%; /* Cartões levemente mais claros que o fundo */
+		--card-foreground: 0 0% 100%; /* Texto branco em cartões */
+		--popover: 220 15% 15%; /* Fundo do popover igual ao dos cartões */
+		--popover-foreground: 0 0% 100%; /* Texto branco no popover */
+		--primary: 207 90% 54%; /* Azul vibrante */
+		--primary-foreground: 0 0% 100%; /* Texto branco em botões primários */
+		--secondary: 120 73% 47%; /* Verde vibrante */
+		--secondary-foreground: 0 0% 100%; /* Texto branco em botões secundários */
+		--muted: 220 10% 20%; /* Cinza escuro para elementos atenuados */
+		--muted-foreground: 0 0% 80%; /* Texto cinza claro em elementos atenuados */
+		--accent: 260 100% 70%; /* Violeta vibrante */
+		--accent-foreground: 0 0% 100%; /* Texto branco em elementos de destaque */
+		--destructive: 0 84.2% 60.2%; /* Vermelho vibrante */
+		--destructive-foreground: 0 0% 100%; /* Texto branco em botões de ação destrutiva */
+		--border: 220 10% 30%; /* Bordas escuras */
+		--input: 220 10% 20%; /* Campos de entrada escuros */
+		--ring: 207 90% 54%; /* Azul vibrante para anéis de foco */
 		--chart-1: 220 70% 50%; /* Azul */
 		--chart-2: 160 60% 45%; /* Verde */
 		--chart-3: 30 80% 55%; /* Laranja */
 		--chart-4: 280 65% 60%; /* Roxo */
 		--chart-5: 340 75% 55%; /* Rosa */
+		--radius: 0.5rem;
 	}
 }
 
@@ -74,4 +75,30 @@ body {
 	body {
 		@apply bg-background text-foreground;
 	}
+}
+
+/* Estilo padrão para a barra de rolagem */
+::-webkit-scrollbar {
+	width: 0.5rem;
+	height: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+	@apply bg-background rounded-xl;
+}
+
+::-webkit-scrollbar-track {
+	@apply bg-background rounded-xl;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+	@apply bg-primary;
+}
+
+*::-webkit-scrollbar-thumb {
+	@apply bg-background rounded-xl;
+}
+
+*::-webkit-scrollbar-track {
+	@apply bg-background rounded-xl;
 }

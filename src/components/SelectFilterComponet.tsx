@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { StatusEnum } from '@/enums/status.enum';
 import { useDispatch } from 'react-redux';
 
-const Filter: React.FC = () => {
+const SelectFilterComponet: React.FC = () => {
 	const dispatch = useDispatch<AppDispatch>();
 
 	const [selectedStatus, setselectedStatus] = useState<StatusEnum>(StatusEnum.ALL);
@@ -37,7 +37,7 @@ const Filter: React.FC = () => {
 	);
 };
 
-export default Filter;
+export default SelectFilterComponet;
 
 /*
 * <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>

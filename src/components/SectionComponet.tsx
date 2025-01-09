@@ -5,7 +5,7 @@ interface SectionProps {
 	children: ReactNode;
 }
 
-const Section: React.FC<SectionProps> = ({ className = '', children }) => {
+const SectionComponet: React.FC<SectionProps> = ({ className = '', children }) => {
 	const classFn = () => {
 		return `${className} py-4 sm:py-8`;
 	};
@@ -17,4 +17,4 @@ const Section: React.FC<SectionProps> = ({ className = '', children }) => {
 	);
 };
 
-export default Section;
+export default SectionComponet;

@@ -3,12 +3,16 @@ import { ITicketsPaginatedResult } from '@/interfaces/tickets-paginated-result.i
 import {
 	addTicketSuccess,
 	addTicketError,
+	addTicketLoading,
 	filterTicketsSuccess,
 	filterTicketsError,
+	filterTicketsLoading,
 	deleteTicketSuccess,
 	deleteTicketError,
+	deleteTicketLoading,
 	editTicketSuccess,
 	editTicketError,
+	editTicketLoading,
 	loadTickets
 } from './tickets-actions';
 import { StatusEnum } from '@/enums/status.enum';
@@ -59,6 +63,9 @@ const ticketsReducer = createReducer(initialState, (builder) => {
 		.addCase(loadTickets, (state) => {
 			state.isLoading = true;
 		})
+		.addCase(addTicketLoading, (state) => {
+			state.isLoading = true;
+		})
 		.addCase(addTicketSuccess, (state, action) => {
 			state.data.docs = [action.payload.ticket, ...state.data.docs];
 			state.data.totalDocs += 1;
@@ -69,6 +76,9 @@ const ticketsReducer = createReducer(initialState, (builder) => {
 			state.error = action.payload.error;
 		})
 		// Edit ticket
+		.addCase(editTicketLoading, (state) => {
+			state.isLoading = true;
+		})
 		.addCase(editTicketSuccess, (state, action) => {
 			const index = state.data.docs.findIndex((ticket) => ticket._id === action.payload.ticket._id);
 			if (index !== -1) {
@@ -82,6 +92,9 @@ const ticketsReducer = createReducer(initialState, (builder) => {
 			state.error = action.payload.error;
 		})
 		// Delete ticket
+		.addCase(deleteTicketLoading, (state) => {
+			state.isLoading = true;
+		})
 		.addCase(deleteTicketSuccess, (state, action) => {
 			state.data.docs = state.data.docs.filter((ticket) => ticket._id !== action.payload.id);
 			state.data.totalDocs -= 1;
@@ -92,6 +105,9 @@ const ticketsReducer = createReducer(initialState, (builder) => {
 			state.error = action.payload.error;
 		})
 		// Filter tickets (API call)
+		.addCase(filterTicketsLoading, (state) => {
+			state.isLoading = true;
+		})
 		.addCase(filterTicketsSuccess, (state, action) => {
 			state.isLoading = false;
 			const { data, status } = action.payload;

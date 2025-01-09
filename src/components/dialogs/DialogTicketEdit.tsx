@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
-import { useDispatch } from 'react-redux';
-import { Button } from '../ui/button';
-import Icon from '../Icon';
-import { Input } from '../ui/input';
-import { AppDispatch } from '@/store';
-import { editTicket } from '@/store/tickets/tickets-actions';
-import { ITicket } from '@/interfaces';
-import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import IconComponet from '../IconComponet';
+import React, { useEffect, useState } from 'react';
+import { AppDispatch } from '@/store';
+import { Button } from '../ui/button';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
+import { editTicket } from '@/store/tickets/tickets-actions';
+import { Input } from '../ui/input';
+import { ITicket } from '@/interfaces';
+import { pipeStatusLabel } from '@/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { StatusEnum } from '@/enums/status.enum';
-import { pipeStatusLabel } from '@/utils';
+import { toast } from 'sonner';
+import { useDispatch } from 'react-redux';
+import { useFormik } from 'formik';
 
 interface DialogTicketEditProps {
 	ticket: ITicket;
@@ -22,6 +23,7 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	const formik = useFormik({
+		enableReinitialize: true,
 		initialValues: {
 			title: ticket.title,
 			description: ticket.description,
@@ -34,32 +36,65 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 			author: Yup.string().required('Autor é obrigatório')
 		}),
 		onSubmit: async (values, { setSubmitting, resetForm }) => {
-			await dispatch(editTicket({ ...ticket, ...values }));
-			setSubmitting(false);
-			resetForm();
-			setIsDialogOpen(false);
+			try {
+				await dispatch(editTicket({ ...ticket, ...values }));
+				toast.success('Ticket atualizado com sucesso!');
+				resetForm();
+				setIsDialogOpen(false);
+			} catch (error) {
+				console.error(error);
+				toast.error('Erro ao atualizar o ticket.');
+			} finally {
+				setSubmitting(false);
+			}
 		}
 	});
+
+	useEffect(() => {
+		// Reinicializa o formulário sempre que o diálogo é aberto
+		if (isDialogOpen) {
+			formik.setValues({
+				title: ticket.title,
+				description: ticket.description,
+				author: ticket.author,
+				status: ticket.status
+			});
+		}
+	}, [isDialogOpen, ticket]);
 
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 			<DialogTrigger asChild>
-				<Button type="button" variant="outline" title="Editar" className="text-violet-600 p-2">
-					<Icon name="Edit" className="w-4 h-4" />
+				<Button type="button" variant="ghost" title="Editar" className="text-violet-600 p-2">
+					<IconComponet name="Edit" className="w-4 h-4" />
 				</Button>
 			</DialogTrigger>
-			<DialogContent>
+			<DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
 				<DialogHeader>
 					<DialogTitle>Editar Ticket</DialogTitle>
 					<DialogDescription>Atualize os dados abaixo para editar o ticket.</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
 					<div>
-						<Input name="title" value={formik.values.title} onChange={formik.handleChange} onBlur={formik.handleBlur} placeholder="Título" />
-						{formik.touched.title && formik.errors.title ? <div className="text-red-500 text-sm">{formik.errors.title}</div> : null}
+						<label htmlFor="title" className="block text-sm font-medium text-gray-700">
+							Título
+						</label>
+						<Input
+							id="title"
+							name="title"
+							value={formik.values.title}
+							onChange={formik.handleChange}
+							onBlur={formik.handleBlur}
+							placeholder="Título"
+						/>
+						{formik.touched.title && formik.errors.title ? <div className="text-red-500 text-xs ms-1">{formik.errors.title}</div> : null}
 					</div>
 					<div>
+						<label htmlFor="description" className="block text-sm font-medium text-gray-700">
+							Descrição
+						</label>
 						<Input
+							id="description"
 							name="description"
 							value={formik.values.description}
 							onChange={formik.handleChange}
@@ -67,14 +102,25 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 							placeholder="Descrição"
 						/>
 						{formik.touched.description && formik.errors.description ? (
-							<div className="text-red-500 text-sm">{formik.errors.description}</div>
+							<div className="text-red-500 text-xs ms-1">{formik.errors.description}</div>
 						) : null}
 					</div>
 					<div>
-						<Input name="author" value={formik.values.author} onChange={formik.handleChange} onBlur={formik.handleBlur} placeholder="Autor" />
-						{formik.touched.author && formik.errors.author ? <div className="text-red-500 text-sm">{formik.errors.author}</div> : null}
+						<label htmlFor="author" className="block text-sm font-medium text-gray-700">
+							Autor
+						</label>
+						<Input
+							id="author"
+							name="author"
+							value={formik.values.author}
+							onChange={formik.handleChange}
+							onBlur={formik.handleBlur}
+							placeholder="Autor"
+						/>
+						{formik.touched.author && formik.errors.author ? <div className="text-red-500 text-xs ms-1">{formik.errors.author}</div> : null}
 					</div>
 					<div>
+						<label className="block text-sm font-medium text-gray-700">Status</label>
 						<Select name="status" value={formik.values.status} onValueChange={(value: StatusEnum) => formik.setFieldValue('status', value)}>
 							<SelectTrigger className="w-full">
 								<SelectValue placeholder="Status" />
@@ -88,12 +134,12 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 							</SelectContent>
 						</Select>
 					</div>
-					<DialogFooter className="gap-2">
+					<DialogFooter className="gap-4 sm:gap-2 flex max-sm:flex-col-reverse">
 						<DialogClose asChild>
 							<Button variant="outline">Cancelar</Button>
 						</DialogClose>
 						<Button type="submit" disabled={formik.isSubmitting || !formik.isValid}>
-							{formik.isSubmitting ? 'Atualizando...' : 'Salvar'}
+							{formik.isSubmitting ? 'Atualizando...' : 'Atualizar'}
 						</Button>
 					</DialogFooter>
 				</form>

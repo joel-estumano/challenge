@@ -8,6 +8,9 @@ import { ITicket } from '@/interfaces';
 import { pipeDateTimeLabel, pipeStatusLabel, styleStatusVariant } from '@/utils';
 import { StatusEnum } from '@/enums/status.enum';
 import { Textarea } from '../ui/textarea';
+import { toast } from 'sonner';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 interface DetailsDialogProps {
 	ticket: ITicket;
@@ -25,8 +28,6 @@ interface IComment {
 const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [comments, setComments] = useState<IComment[]>([]);
-	const [newComment, setNewComment] = useState<string>('');
-	const [newAuthor, setNewAuthor] = useState<string>('');
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -44,33 +45,37 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 		}
 	};
 
-	const handleAddComment = async () => {
-		if (!newComment.trim()) {
-			setError('O comentário não pode estar vazio.');
-			return;
-		}
+	const formik = useFormik({
+		initialValues: {
+			newComment: '',
+			newAuthor: ''
+		},
+		validationSchema: Yup.object({
+			newComment: Yup.string().required('O comentário não pode estar vazio.'),
+			newAuthor: Yup.string().required('O nome do autor não pode estar vazio.')
+		}),
+		onSubmit: async (values, { setSubmitting, resetForm }) => {
+			setSubmitting(true);
+			try {
+				const response = await api.post('/ticket-comments', {
+					ticket: ticket._id,
+					content: values.newComment,
+					author: values.newAuthor
+				});
 
-		if (!newAuthor.trim()) {
-			setError('O nome do autor não pode estar vazio.');
-			return;
+				setComments((prevComments) => [response.data, ...prevComments]);
+				resetForm();
+				setError(null);
+				toast.success('Comentário adicionado com sucesso!');
+			} catch (error) {
+				console.error('Failed to add comment:', error);
+				setError('Falha ao adicionar o comentário.');
+				toast.error('Erro ao adicionar o comentário');
+			} finally {
+				setSubmitting(false);
+			}
 		}
-
-		try {
-			const response = await api.post('/ticket-comments', {
-				ticket: ticket._id,
-				content: newComment,
-				author: newAuthor
-			});
-
-			setComments((prevComments) => [response.data, ...prevComments]);
-			setNewComment('');
-			setNewAuthor('');
-			setError(null);
-		} catch (error) {
-			console.error('Failed to add comment:', error);
-			setError('Falha ao adicionar o comentário.');
-		}
-	};
+	});
 
 	return (
 		<>
@@ -78,56 +83,121 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 				<DialogTrigger asChild>
 					<a className="hover:underline">{children}</a>
 				</DialogTrigger>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Detalhes do Ticket</DialogTitle>
-						<DialogDescription></DialogDescription>
-						<div className="my-2 flex max-sm:justify-center">
-							<Badge variant={styleStatusVariant(ticket.status)} className="min-w-24 h-fit w-24 items-center justify-center flex">
-								<span className="text-[.6rem]">{pipeStatusLabel(ticket.status)}</span>
-							</Badge>
-						</div>
-						<DialogDescription>
-							<strong>ID:</strong> {ticket._id}
-						</DialogDescription>
-						<DialogDescription>
-							<strong>Autor:</strong> {ticket.author}
-						</DialogDescription>
-						<DialogDescription>
-							<strong>Título:</strong> {ticket.title}
-						</DialogDescription>
-						<DialogDescription>
-							<strong>Data de criação:</strong> {pipeDateTimeLabel(ticket.createdAt as StatusEnum)}
-						</DialogDescription>
-						<DialogDescription>
-							<strong>Última Atualização:</strong> {pipeDateTimeLabel(ticket.updatedAt as StatusEnum)}
-						</DialogDescription>
-					</DialogHeader>
-					<div className="overflow-y-hidden">
-						<h3 className="mt-4 text-lg font-semibold">Comentários</h3>
-						<div className={`mt-2 flex flex-col space-y-2 overflow-y-auto ${comments.length ? 'h-[200px]' : ''}`}>
-							{comments.map((comment) => (
-								<div key={comment._id} className="p-2 border border-gray-300 rounded">
-									<p className="text-sm">{comment.content}</p>
-									<p className="text-xs text-gray-500">Autor: {comment.author}</p>
-									<p className="text-xs text-gray-500">Data: {pipeDateTimeLabel(comment.createdAt as StatusEnum)}</p>
-								</div>
-							))}
-						</div>
+				<DialogContent
+					className="min-w-[60vw] grid grid-cols-1 xl:grid-cols-2 overflow-y-auto max-h-[86vh]"
+					onOpenAutoFocus={(e) => e.preventDefault()}
+				>
+					<div>
+						<DialogHeader>
+							<DialogTitle>Detalhes do Ticket</DialogTitle>
+							<DialogDescription></DialogDescription>
+							<div className="my-2 flex max-sm:justify-center">
+								<Badge
+									variant={styleStatusVariant(ticket.status as Exclude<StatusEnum, StatusEnum.ALL>)}
+									className="min-w-24 h-fit w-24 items-center justify-center flex"
+								>
+									<span className="text-[.6rem]">{pipeStatusLabel(ticket.status)}</span>
+								</Badge>
+							</div>
+							<div className="mt-4">
+								<label htmlFor="ticketId" className="block text-sm font-medium text-gray-700">
+									ID
+								</label>
+								<DialogDescription id="ticketId">{ticket._id}</DialogDescription>
+							</div>
+							<div className="mt-2">
+								<label htmlFor="ticketAuthor" className="block text-sm font-medium text-gray-700">
+									Autor
+								</label>
+								<DialogDescription id="ticketAuthor">{ticket.author}</DialogDescription>
+							</div>
+							<div className="mt-2">
+								<label htmlFor="ticketTitle" className="block text-sm font-medium text-gray-700">
+									Título
+								</label>
+								<DialogDescription id="ticketTitle">{ticket.title}</DialogDescription>
+							</div>
+							<div className="mt-2">
+								<label htmlFor="ticketDescription" className="block text-sm font-medium text-gray-700">
+									Descrição
+								</label>
+								<DialogDescription id="ticketDescription">{ticket.description}</DialogDescription>
+							</div>
+							<div className="mt-2">
+								<label htmlFor="ticketCreatedAt" className="block text-sm font-medium text-gray-700">
+									Data de criação
+								</label>
+								<DialogDescription id="ticketCreatedAt">{pipeDateTimeLabel(ticket.createdAt as StatusEnum)}</DialogDescription>
+							</div>
+							<div className="mt-2">
+								<label htmlFor="ticketUpdatedAt" className="block text-sm font-medium text-gray-700">
+									Última Atualização
+								</label>
+								<DialogDescription id="ticketUpdatedAt">{pipeDateTimeLabel(ticket.updatedAt as StatusEnum)}</DialogDescription>
+							</div>
+						</DialogHeader>
 					</div>
-					<div className="flex flex-col gap-4 mt-4 ">
-						<Input value={newAuthor} onChange={(e) => setNewAuthor(e.target.value)} placeholder="Seu nome" />
-						<Textarea value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder="Adicionar um comentário" />
-						{error && <p className="text-red-500 text-sm">{error}</p>}
+					<div className="">
+						<div>
+							<DialogTitle className="max-sm:text-center">Comentários</DialogTitle>
+							<div className="mt-2 flex flex-col flex-grow space-y-2 overflow-y-auto h-[300px] border rounded p-1">
+								{comments.length === 0 ? (
+									<p className="text-center py-4">Nada por aqui</p>
+								) : (
+									comments.map((comment) => (
+										<div key={comment._id} className="p-2 border rounded">
+											<p className="text-sm">{comment.content}</p>
+											<p className="text-xs text-gray-500">Autor: {comment.author}</p>
+											<p className="text-xs text-gray-500">Data: {pipeDateTimeLabel(comment.createdAt as StatusEnum)}</p>
+										</div>
+									))
+								)}
+							</div>
+						</div>
+						<form onSubmit={formik.handleSubmit} className="flex flex-col gap-4 mt-4">
+							<div>
+								<label htmlFor="newAuthor" className="block text-sm font-medium text-gray-700">
+									Seu nome
+								</label>
+								<Input
+									id="newAuthor"
+									name="newAuthor"
+									value={formik.values.newAuthor}
+									onChange={formik.handleChange}
+									onBlur={formik.handleBlur}
+									placeholder="Seu nome"
+								/>
+								{formik.touched.newAuthor && formik.errors.newAuthor ? (
+									<div className="text-red-500 text-xs ms-1">{formik.errors.newAuthor}</div>
+								) : null}
+							</div>
+							<div>
+								<label htmlFor="newComment" className="block text-sm font-medium text-gray-700">
+									Adicionar um comentário
+								</label>
+								<Textarea
+									id="newComment"
+									name="newComment"
+									value={formik.values.newComment}
+									onChange={formik.handleChange}
+									onBlur={formik.handleBlur}
+									placeholder="Adicionar um comentário"
+								/>
+								{formik.touched.newComment && formik.errors.newComment ? (
+									<div className="text-red-500 text-xs ms-1">{formik.errors.newComment}</div>
+								) : null}
+							</div>
+							{error && <div className="text-red-500 text-xs ms-1">{error}</div>}
+							<DialogFooter className="gap-4 sm:gap-2 flex flex-col">
+								<Button type="submit" disabled={formik.isSubmitting}>
+									{formik.isSubmitting ? 'Adicionando comentário...' : 'Adicionar Comentário'}
+								</Button>
+								<DialogClose asChild>
+									<Button variant="outline">Fechar</Button>
+								</DialogClose>
+							</DialogFooter>
+						</form>
 					</div>
-					<DialogFooter className="gap-2">
-						<Button type="button" onClick={handleAddComment}>
-							Adicionar Comentário
-						</Button>
-						<DialogClose asChild>
-							<Button variant="outline">Fechar</Button>
-						</DialogClose>
-					</DialogFooter>
 				</DialogContent>
 			</Dialog>
 		</>

@@ -17,7 +17,7 @@ interface IconProps {
  * @param {string} [className] - Classes CSS adicionais para estilização.
  * @returns {JSX.Element | null} - O componente de ícone ou null se não encontrado.
  */
-const Icon: React.FC<IconProps> = ({ name, className }) => {
+const IconComponet: React.FC<IconProps> = ({ name, className }) => {
 	const IconComponent = LucideIcons[name];
 
 	if (!IconComponent) {
@@ -28,4 +28,4 @@ const Icon: React.FC<IconProps> = ({ name, className }) => {
 	return <IconComponent className={clsx(className)} />;
 };
 
-export default Icon;
+export default IconComponet;
