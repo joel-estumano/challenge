@@ -8,11 +8,13 @@ import { StatusEnum } from '@/enums/status.enum';
  */
 export function pipeStatusLabel(status: StatusEnum = StatusEnum.OPEN): string {
 	switch (status) {
+		case StatusEnum.OPEN:
+			return 'Aberto';
 		case StatusEnum.PROGRESS:
 			return 'Em Progresso';
 		case StatusEnum.DONE:
 			return 'Concluído';
-		default:
-			return 'Aberto';
+		case StatusEnum.ALL:
+			return 'Todos';
 	}
 }

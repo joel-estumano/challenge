@@ -1,16 +1,19 @@
+import api from '@/services/api';
 import { call, put, takeLatest } from 'redux-saga/effects';
-import api from '../../services/api';
-import { loadTickets, loadTicketsSuccess, loadTicketsError } from './tickets-actions';
-import { PayloadAction } from '@reduxjs/toolkit';
 import { ITicketsPaginatedResult } from '@/interfaces/tickets-paginated-result.interface';
-function* fetchTickets(action: PayloadAction<number>) {
+import { loadTickets, filterTicketsSuccess, filterTicketsError } from './tickets-actions';
+import { PayloadAction } from '@reduxjs/toolkit';
+import { handleApiError } from '@/utils';
+import { StatusEnum } from '@/enums/status.enum';
+
+function* fetchTickets(action: PayloadAction<number>): Generator {
 	try {
 		console.log('Effect: fetchTickets');
-		const response = yield call(api.get, `/tickets?page=${action.payload}`);
+		const response: { data: ITicketsPaginatedResult } = yield call(api.get, `/tickets?page=${action.payload}`);
 		const data: ITicketsPaginatedResult = response.data;
-		yield put(loadTicketsSuccess(data));
+		yield put(filterTicketsSuccess({ data, status: [StatusEnum.ALL] }));
 	} catch (error) {
-		yield put(loadTicketsError({ error: error.message }));
+		yield put(filterTicketsError({ error: handleApiError(error) }));
 	}
 }
 

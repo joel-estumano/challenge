@@ -1,9 +1,18 @@
-import { createReducer, createAction } from '@reduxjs/toolkit';
+import { createReducer } from '@reduxjs/toolkit';
 import { ITicketsPaginatedResult } from '@/interfaces/tickets-paginated-result.interface';
-import { loadTickets, loadTicketsSuccess, loadTicketsError } from './tickets-actions';
-
-export const deleteTicketSuccess = createAction<{ id: string }>('DELETE_TICKET_SUCCESS');
-export const deleteTicketError = createAction<{ error: string }>('DELETE_TICKET_ERROR');
+import {
+	addTicketSuccess,
+	addTicketError,
+	filterTicketsSuccess,
+	filterTicketsError,
+	deleteTicketSuccess,
+	deleteTicketError,
+	editTicketSuccess,
+	editTicketError,
+	loadTickets
+} from './tickets-actions';
+import { StatusEnum } from '@/enums/status.enum';
+import { ITicket } from '@/interfaces';
 
 interface TicketsState {
 	data: ITicketsPaginatedResult;
@@ -33,37 +42,80 @@ const initialState: TicketsState = {
 };
 
 const ticketsReducer = createReducer(initialState, (builder) => {
+	const localSort = (state: TicketsState) => {
+		const filteredAndSortedTickets = state.data.docs
+			.filter((ticket): ticket is ITicket & { updatedAt: string } => ticket.updatedAt !== undefined)
+			.sort((a, b) => {
+				const dateA = new Date(a.updatedAt).getTime();
+				const dateB = new Date(b.updatedAt).getTime();
+				return dateB - dateA;
+			});
+		state.data.docs = filteredAndSortedTickets;
+		state.data.totalDocs = filteredAndSortedTickets.length;
+	};
+
 	builder
+		// Load tickets
 		.addCase(loadTickets, (state) => {
-			console.log('Reducer: loadTickets');
 			state.isLoading = true;
 		})
-		.addCase(loadTicketsSuccess, (state, action) => {
-			console.log('Reducer: loadTicketsSuccess', action.payload);
+		.addCase(addTicketSuccess, (state, action) => {
+			state.data.docs = [action.payload.ticket, ...state.data.docs];
+			state.data.totalDocs += 1;
 			state.isLoading = false;
-			state.data.docs = [...state.data.docs, ...action.payload.docs];
-			state.data.totalDocs = action.payload.totalDocs;
-			state.data.limit = action.payload.limit;
-			state.data.totalPages = action.payload.totalPages;
-			state.data.page = action.payload.page;
-			state.data.pagingCounter = action.payload.pagingCounter;
-			state.data.hasPrevPage = action.payload.hasPrevPage;
-			state.data.hasNextPage = action.payload.hasNextPage;
-			state.data.prevPage = action.payload.prevPage;
-			state.data.nextPage = action.payload.nextPage;
-			state.page = action.payload.page + 1;
-			state.hasMore = action.payload.hasNextPage;
 		})
-		.addCase(loadTicketsError, (state, action) => {
-			console.log('Reducer: loadTicketsError', action.payload);
+		.addCase(addTicketError, (state, action) => {
 			state.isLoading = false;
 			state.error = action.payload.error;
 		})
+		// Edit ticket
+		.addCase(editTicketSuccess, (state, action) => {
+			const index = state.data.docs.findIndex((ticket) => ticket._id === action.payload.ticket._id);
+			if (index !== -1) {
+				state.data.docs[index] = action.payload.ticket;
+			}
+			state.isLoading = false;
+			localSort(state);
+		})
+		.addCase(editTicketError, (state, action) => {
+			state.isLoading = false;
+			state.error = action.payload.error;
+		})
+		// Delete ticket
 		.addCase(deleteTicketSuccess, (state, action) => {
 			state.data.docs = state.data.docs.filter((ticket) => ticket._id !== action.payload.id);
 			state.data.totalDocs -= 1;
+			state.isLoading = false;
 		})
 		.addCase(deleteTicketError, (state, action) => {
+			state.isLoading = false;
+			state.error = action.payload.error;
+		})
+		// Filter tickets (API call)
+		.addCase(filterTicketsSuccess, (state, action) => {
+			state.isLoading = false;
+			const { data, status } = action.payload;
+			const newTickets = data.docs;
+			const combinedTickets = [...state.data.docs.filter((doc) => status.includes(doc.status as StatusEnum)), ...newTickets].filter(
+				(ticket, index, self) => index === self.findIndex((t) => t._id === ticket._id)
+			);
+			state.data.docs = combinedTickets;
+			state.data.totalDocs = combinedTickets.length;
+			state.data.totalDocs = data.totalDocs;
+			state.data.limit = data.limit;
+			state.data.totalPages = data.totalPages;
+			state.data.page = data.page;
+			state.data.pagingCounter = data.pagingCounter;
+			state.data.hasPrevPage = data.hasPrevPage;
+			state.data.hasNextPage = data.hasNextPage;
+			state.data.prevPage = data.prevPage;
+			state.data.nextPage = data.nextPage;
+			state.page = data.page + 1;
+			state.hasMore = data.hasNextPage;
+			localSort(state);
+		})
+		.addCase(filterTicketsError, (state, action) => {
+			state.isLoading = false;
 			state.error = action.payload.error;
 		});
 });

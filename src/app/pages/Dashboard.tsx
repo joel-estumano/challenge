@@ -1,26 +1,30 @@
+import DialogTicketAdd from '../../components/dialogs/DialogTicketAdd';
+import DialogTicketConfirmDelete from '../../components/dialogs/DialogTicketConfirmDelete';
+import DialogTicketEdit from '../../components/dialogs/DialogTicketEdit';
+import Filter from '../../components/Filter';
+import Icon from '../../components/Icon';
+import NavBar from '../../components/NavBar';
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { deleteTicket, loadTickets } from '../store/tickets/tickets-actions';
-import { RootState } from '../store';
-import { useInView } from 'react-intersection-observer';
+import Section from '../../components/Section';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../components/ui/accordion';
+import { AppDispatch, RootState } from '../../store';
+import { Badge } from '../../components/ui/badge';
 import { ITicket } from '@/interfaces';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from './ui/badge';
-import Section from './Section';
-import Icon from './Icon';
-import { Button } from './ui/button';
+import { loadTickets, filterTickets } from '../../store/tickets/tickets-actions';
+import { pipeDateTimeLabel, styleStatusVariant } from '@/utils';
 import { StatusEnum } from '@/enums/status.enum';
-import NavBar from './NavBar';
-import { useBreakpoint } from './context/breakpoint';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
-import DialogTicketConfirmDelete from './dialogs/DialogTicketConfirmDelete';
-import DialogTicketDetails from './dialogs/DialogTicketDetails';
-import { pipeDateTimeLabel, pipeStatusLabel, styleStatusVariant } from '@/utils';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../components/ui/tooltip';
+import { useBreakpoint } from '../../components/context/breakpoint';
+import { useDispatch, useSelector } from 'react-redux';
+import { useInView } from 'react-intersection-observer';
+import DialogTicketComment from '../../components/dialogs/DialogTicketComment';
+import { Button } from '../../components/ui/button';
+import UpdateStatus from '@/components/UpdateStatus';
 
 const Dashboard: React.FC = () => {
 	const { isMobile } = useBreakpoint();
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
 	const { data, isLoading, error, page, hasMore } = useSelector((state: RootState) => state.tickets);
 	const { ref, inView } = useInView({
 		threshold: 0.5,
@@ -28,51 +32,44 @@ const Dashboard: React.FC = () => {
 	});
 
 	useEffect(() => {
-		console.log('Initial Load, Page:', page);
 		if (page === 1 && !isLoading) {
-			dispatch(loadTickets(page));
+			dispatch(filterTickets(StatusEnum.ALL));
 		}
 	}, [dispatch, page, isLoading]);
 
 	useEffect(() => {
-		console.log('In View:', inView, 'Has More:', hasMore, 'Is Loading:', isLoading);
 		if (inView && hasMore && !isLoading) {
 			dispatch(loadTickets(page));
 		}
 	}, [inView, hasMore, isLoading, dispatch, page]);
 
-	useEffect(() => {
-		console.log('Loading Status Changed:', isLoading);
-	}, [isLoading]);
-
-	const handleDelete = (id: string) => {
-		dispatch(deleteTicket(id));
-	};
-
 	if (error) return <p>Error: {error}</p>;
 
 	return (
 		<div className="flex flex-col w-full max-h-screen overflow-hidden min-h-svh bg-gradient-to-r from-violet-200 to-background">
-			<div className=" flex flex-col flex-grow overflow-y-auto">
+			<div className="flex flex-col flex-grow overflow-y-auto">
 				<NavBar />
 				<div className="relative flex flex-col flex-grow overflow-y-auto">
 					<div className="flex-grow">
 						<Section>
+							<div className="mb-6 max-sm:flex-col-reverse flex justify-between gap-8">
+								<Filter />
+								<DialogTicketAdd />
+							</div>
+
 							{isMobile ? (
 								<Accordion ref={ref} type="single" collapsible className="w-full">
 									{data.docs.map((ticket: ITicket) => (
 										<AccordionItem value={ticket._id as string} key={ticket._id}>
 											<AccordionTrigger>
-												<div className="flex justify-between pe-2 w-full">
-													<DialogTicketDetails ticket={ticket}>
-														<strong>{ticket.title}</strong>
-													</DialogTicketDetails>
+												<div className="flex gap-3 pe-2 w-full">
 													<Badge
 														variant={styleStatusVariant(ticket.status)}
 														className="min-w-24 h-fit w-24 items-center justify-center flex"
 													>
-														<span className="text-[.6rem]">{pipeStatusLabel(ticket.status)}</span>
+														<UpdateStatus ticket={ticket} />
 													</Badge>
+													<strong>{ticket.title}</strong>
 												</div>
 											</AccordionTrigger>
 											<AccordionContent className="">
@@ -89,12 +86,14 @@ const Dashboard: React.FC = () => {
 														</p>
 													</div>
 
-													<div className="flex gap-4 items-center ">
-														<DialogTicketDetails ticket={ticket} />
-														<Button type="button" variant="outline" title="Editar" className="text-violet-600 p-2">
-															<Icon name="Edit" className="w-4 h-4" />
-														</Button>
-														<DialogTicketConfirmDelete ticket={ticket} onConfirm={handleDelete} />
+													<div className="flex gap-4 items-center">
+														<DialogTicketComment ticket={ticket}>
+															<Button type="button" variant="outline" title="Detalhes" className="text-yellow-600 p-2">
+																<Icon name="Eye" className="w-4 h-4" />
+															</Button>
+														</DialogTicketComment>
+														<DialogTicketEdit ticket={ticket} />
+														<DialogTicketConfirmDelete ticket={ticket} />
 													</div>
 												</div>
 											</AccordionContent>
@@ -133,23 +132,28 @@ const Dashboard: React.FC = () => {
 														</TooltipProvider>
 													</TableCell>
 													<TableCell className="px-2 py-2 text-xs sm:text-sm">
-														<Badge variant={styleStatusVariant(ticket.status)} className="w-24 items-center justify-center flex">
-															<span className="text-[.6rem]">{pipeStatusLabel(ticket.status)}</span>
+														<Badge
+															variant={styleStatusVariant(ticket.status)}
+															className="min-w-24 h-fit w-24 items-center justify-center flex"
+														>
+															<UpdateStatus ticket={ticket} />
 														</Badge>
 													</TableCell>
 													<TableCell className="px-2 py-2 text-xs sm:text-sm">
-														<DialogTicketDetails ticket={ticket}>{ticket.title}</DialogTicketDetails>
+														<DialogTicketComment ticket={ticket}>{ticket.title}</DialogTicketComment>
 													</TableCell>
 													<TableCell className="px-2 py-2 text-xs sm:text-sm">
 														{pipeDateTimeLabel(ticket.updatedAt as StatusEnum)}
 													</TableCell>
 													<TableCell className="px-2 py-2 text-xs sm:text-sm">
 														<div className="flex gap-2 sm:gap-4 items-center justify-end">
-															<DialogTicketDetails ticket={ticket} />
-															<Button type="button" variant="outline" title="Editar" className="text-violet-600 p-2">
-																<Icon name="Edit" className="w-4 h-4" />
-															</Button>
-															<DialogTicketConfirmDelete ticket={ticket} onConfirm={handleDelete} />
+															<DialogTicketComment ticket={ticket}>
+																<Button type="button" variant="ghost" title="Detalhes" className="text-yellow-600 p-2">
+																	<Icon name="Eye" className="w-4 h-4" />
+																</Button>
+															</DialogTicketComment>
+															<DialogTicketEdit ticket={ticket} />
+															<DialogTicketConfirmDelete ticket={ticket} />
 														</div>
 													</TableCell>
 												</TableRow>

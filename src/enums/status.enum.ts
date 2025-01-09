@@ -1,5 +1,6 @@
 export enum StatusEnum {
 	OPEN = 'OPEN',
 	PROGRESS = 'PROGRESS',
-	DONE = 'DONE'
+	DONE = 'DONE',
+	ALL = 'ALL'
 }

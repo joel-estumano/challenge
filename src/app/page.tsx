@@ -2,7 +2,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import store from '../store';
-import Dashboard from '@/components/Dashboard';
+import Dashboard from '@/app/pages/Dashboard';
 import { BreakpointProvider } from '@/components/context/breakpoint';
 
 const Home: React.FC = () => {

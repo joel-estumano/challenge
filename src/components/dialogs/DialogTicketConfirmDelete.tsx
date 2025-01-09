@@ -1,21 +1,25 @@
-import React, { useState } from 'react';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import Icon from '@/components/Icon';
-import { ITicket } from '@/interfaces';
+import React, { useState } from 'react';
+import { AppDispatch, RootState } from '@/store';
 import { Button } from '../ui/button';
-import { StatusEnum } from '@/enums/status.enum';
+import { deleteTicket } from '@/store/tickets/tickets-actions';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { ITicket } from '@/interfaces';
 import { pipeDateTimeLabel } from '@/utils';
+import { StatusEnum } from '@/enums/status.enum';
+import { useDispatch, useSelector } from 'react-redux';
 
 interface ConfirmDeleteDialogProps {
 	ticket: ITicket;
-	onConfirm: (id: string) => void;
 }
 
-const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({ ticket, onConfirm }) => {
+const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({ ticket }) => {
+	const dispatch = useDispatch<AppDispatch>();
+	const { isLoading } = useSelector((state: RootState) => state.tickets);
 	const [isOpen, setIsOpen] = useState(false);
 
 	const handleConfirm = () => {
-		onConfirm(ticket._id as string);
+		dispatch(deleteTicket(ticket._id as string));
 		setIsOpen(false);
 	};
 
@@ -52,8 +56,8 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({ ticket, onCon
 						<Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
 							Cancelar
 						</Button>
-						<Button type="button" variant="destructive" onClick={handleConfirm}>
-							Confirmar
+						<Button type="button" variant="destructive" onClick={handleConfirm} disabled={isLoading}>
+							{isLoading ? 'Excluindo...' : 'Confirmar'}
 						</Button>
 					</div>
 				</DialogContent>

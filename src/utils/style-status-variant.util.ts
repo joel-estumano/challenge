@@ -4,8 +4,8 @@ type BadgeVariant = 'destructive' | 'secondary' | 'default';
 
 const statusToVariantMap: Record<StatusEnum, BadgeVariant> = {
 	[StatusEnum.OPEN]: 'destructive',
-	[StatusEnum.PROGRESS]: 'secondary',
-	[StatusEnum.DONE]: 'default'
+	[StatusEnum.PROGRESS]: 'default',
+	[StatusEnum.DONE]: 'secondary'
 };
 
 /**

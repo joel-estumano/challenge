@@ -20,8 +20,8 @@ body {
 		--popover-foreground: 220 10% 15%;
 		--primary: 207 90% 54%; /* Azul Vibrante */
 		--primary-foreground: 0 0% 100%;
-		--secondary: 48 100% 50%; /* Amarelo Dourado */
-		--secondary-foreground: 220 15% 20%;
+		--secondary: 120 73% 47%; /* Verde Vibrante */
+		--secondary-foreground: 0 0% 100%; /* Branco */
 		--muted: 210 8% 90%; /* Cinza Claro */
 		--muted-foreground: 220 10% 30%;
 		--accent: 260 100% 70%; /* Violeta */
@@ -48,8 +48,8 @@ body {
 		--popover-foreground: 0 0% 95%;
 		--primary: 207 90% 54%; /* Azul Vibrante */
 		--primary-foreground: 0 0% 100%;
-		--secondary: 48 100% 50%; /* Amarelo Dourado */
-		--secondary-foreground: 0 0% 95%;
+		--secondary: 120 73% 47%; /* Verde Vibrante */
+		--secondary-foreground: 0 0% 100%; /* Branco */
 		--muted: 220 15% 20%; /* Cinza Escuro */
 		--muted-foreground: 0 0% 95%;
 		--accent: 260 100% 70%; /* Violeta */

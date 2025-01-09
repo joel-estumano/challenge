@@ -5,28 +5,21 @@ import { Button } from '../ui/button';
 import Icon from '../Icon';
 import { Input } from '../ui/input';
 import { AppDispatch } from '@/store';
-import { editTicket } from '@/store/tickets/tickets-actions';
-import { ITicket } from '@/interfaces';
+import { addTicket } from '@/store/tickets/tickets-actions';
+import { StatusEnum } from '@/enums/status.enum';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { StatusEnum } from '@/enums/status.enum';
-import { pipeStatusLabel } from '@/utils';
 
-interface DialogTicketEditProps {
-	ticket: ITicket;
-}
-
-const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
+const DialogAddTicket: React.FC = () => {
 	const dispatch = useDispatch<AppDispatch>();
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const status = StatusEnum.OPEN;
 
 	const formik = useFormik({
 		initialValues: {
-			title: ticket.title,
-			description: ticket.description,
-			author: ticket.author,
-			status: ticket.status
+			title: '',
+			description: '',
+			author: ''
 		},
 		validationSchema: Yup.object({
 			title: Yup.string().required('Título é obrigatório'),
@@ -34,7 +27,7 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 			author: Yup.string().required('Autor é obrigatório')
 		}),
 		onSubmit: async (values, { setSubmitting, resetForm }) => {
-			await dispatch(editTicket({ ...ticket, ...values }));
+			await dispatch(addTicket({ ...values, status }));
 			setSubmitting(false);
 			resetForm();
 			setIsDialogOpen(false);
@@ -44,19 +37,20 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 			<DialogTrigger asChild>
-				<Button type="button" variant="outline" title="Editar" className="text-violet-600 p-2">
-					<Icon name="Edit" className="w-4 h-4" />
+				<Button type="button" className="flex items-center gap-1">
+					<Icon name="Plus" className="w-4 h-4" />
+					Ticket
 				</Button>
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Editar Ticket</DialogTitle>
-					<DialogDescription>Atualize os dados abaixo para editar o ticket.</DialogDescription>
+					<DialogTitle>Adicionar novo Ticket</DialogTitle>
+					<DialogDescription>Preencha os dados abaixo para adicionar um novo ticket.</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
 					<div>
 						<Input name="title" value={formik.values.title} onChange={formik.handleChange} onBlur={formik.handleBlur} placeholder="Título" />
-						{formik.touched.title && formik.errors.title ? <div className="text-red-500 text-sm">{formik.errors.title}</div> : null}
+						{formik.touched.title && formik.errors.title ? <div className="text-red-500 text-xs ms-1">{formik.errors.title}</div> : null}
 					</div>
 					<div>
 						<Input
@@ -67,33 +61,19 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 							placeholder="Descrição"
 						/>
 						{formik.touched.description && formik.errors.description ? (
-							<div className="text-red-500 text-sm">{formik.errors.description}</div>
+							<div className="text-red-500 text-xs ms-1">{formik.errors.description}</div>
 						) : null}
 					</div>
 					<div>
 						<Input name="author" value={formik.values.author} onChange={formik.handleChange} onBlur={formik.handleBlur} placeholder="Autor" />
-						{formik.touched.author && formik.errors.author ? <div className="text-red-500 text-sm">{formik.errors.author}</div> : null}
-					</div>
-					<div>
-						<Select name="status" value={formik.values.status} onValueChange={(value: StatusEnum) => formik.setFieldValue('status', value)}>
-							<SelectTrigger className="w-full">
-								<SelectValue placeholder="Status" />
-							</SelectTrigger>
-							<SelectContent>
-								{[StatusEnum.OPEN, StatusEnum.PROGRESS, StatusEnum.DONE].map((status) => (
-									<SelectItem key={status} value={status}>
-										{pipeStatusLabel(status)}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+						{formik.touched.author && formik.errors.author ? <div className="text-red-500 text-xs ms-1">{formik.errors.author}</div> : null}
 					</div>
 					<DialogFooter className="gap-2">
 						<DialogClose asChild>
 							<Button variant="outline">Cancelar</Button>
 						</DialogClose>
 						<Button type="submit" disabled={formik.isSubmitting || !formik.isValid}>
-							{formik.isSubmitting ? 'Atualizando...' : 'Salvar'}
+							{formik.isSubmitting ? 'Enviando...' : 'Salvar'}
 						</Button>
 					</DialogFooter>
 				</form>
@@ -102,4 +82,4 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 	);
 };
 
-export default DialogTicketEdit;
+export default DialogAddTicket;
