@@ -41,7 +41,7 @@ const DropdownUpdateStatusComponent: React.FC<DropdownUpdateStatusComponentProps
 			</PopoverTrigger>
 			<PopoverContent className="p-4 w-42" onClick={(e) => e.preventDefault()}>
 				<div className="flex flex-col gap-2">
-					<Select name="status" value={status} onValueChange={setStatus}>
+					<Select name="status" value={status} onValueChange={(value) => setStatus(value as StatusEnum)}>
 						<SelectTrigger className="w-full">
 							<SelectValue placeholder="Status" />
 						</SelectTrigger>
