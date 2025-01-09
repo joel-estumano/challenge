@@ -24,7 +24,7 @@ const IconComponet: React.FC<IconProps> = ({ name, className }) => {
 		console.error(`Ícone "${name}" não encontrado em lucide-react`);
 		return null;
 	}
-
+	// @ts-expect-error: IconComponent pode ter um tipo incompatível
 	return <IconComponent className={clsx(className)} />;
 };
 
