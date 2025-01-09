@@ -16,7 +16,6 @@ import {
 	loadTickets
 } from './tickets-actions';
 import { StatusEnum } from '@/enums/status.enum';
-import { ITicket } from '@/interfaces';
 
 interface TicketsState {
 	data: ITicketsPaginatedResult;
@@ -46,17 +45,17 @@ const initialState: TicketsState = {
 };
 
 const ticketsReducer = createReducer(initialState, (builder) => {
-	const localSort = (state: TicketsState) => {
-		const filteredAndSortedTickets = state.data.docs
-			.filter((ticket): ticket is ITicket & { updatedAt: string } => ticket.updatedAt !== undefined)
-			.sort((a, b) => {
-				const dateA = new Date(a.updatedAt).getTime();
-				const dateB = new Date(b.updatedAt).getTime();
-				return dateB - dateA;
-			});
-		state.data.docs = filteredAndSortedTickets;
-		state.data.totalDocs = filteredAndSortedTickets.length;
-	};
+	// const localSort = (state: TicketsState) => {
+	// 	const filteredAndSortedTickets = state.data.docs
+	// 		.filter((ticket): ticket is ITicket & { updatedAt: string } => ticket.updatedAt !== undefined)
+	// 		.sort((a, b) => {
+	// 			const dateA = new Date(a.updatedAt).getTime();
+	// 			const dateB = new Date(b.updatedAt).getTime();
+	// 			return dateB - dateA;
+	// 		});
+	// 	state.data.docs = filteredAndSortedTickets;
+	// 	state.data.totalDocs = filteredAndSortedTickets.length;
+	// };
 
 	builder
 		// Load tickets
@@ -85,7 +84,6 @@ const ticketsReducer = createReducer(initialState, (builder) => {
 				state.data.docs[index] = action.payload.ticket;
 			}
 			state.isLoading = false;
-			localSort(state);
 		})
 		.addCase(editTicketError, (state, action) => {
 			state.isLoading = false;
@@ -128,7 +126,6 @@ const ticketsReducer = createReducer(initialState, (builder) => {
 			state.data.nextPage = data.nextPage;
 			state.page = data.page + 1;
 			state.hasMore = data.hasNextPage;
-			localSort(state);
 		})
 		.addCase(filterTicketsError, (state, action) => {
 			state.isLoading = false;
