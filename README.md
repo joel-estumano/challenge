@@ -95,5 +95,3 @@ Este projeto foi desenvolvido por Joel Estumano. Se tiver alguma dúvida ou suge
 Este projeto é licenciado sob a [MIT License](LICENSE).
 
 ---
-
-Com essas informações, a seção `About` do seu repositório Git estará bem documentada, clara e profissional. Se precisar de mais alguma coisa ou quiser ajustar algum detalhe, estou à disposição! 🌟
