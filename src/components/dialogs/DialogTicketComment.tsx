@@ -56,7 +56,7 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 		},
 		validationSchema: Yup.object({
 			newComment: Yup.string().required('O comentário não pode estar vazio.'),
-			newAuthor: Yup.string().required('O nome do autor não pode estar vazio.')
+			newAuthor: Yup.string().required('O nome do criador não pode estar vazio.')
 		}),
 		onSubmit: async (values, { setSubmitting, resetForm }) => {
 			setSubmitting(true);
@@ -111,7 +111,7 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 							</div>
 							<div className="mt-2">
 								<label htmlFor="ticketAuthor" className="block text-sm font-medium text-gray-700">
-									Autor
+									Criador
 								</label>
 								<DialogDescription id="ticketAuthor">{ticket.author}</DialogDescription>
 							</div>
@@ -153,8 +153,8 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 									comments.map((comment) => (
 										<div key={comment._id} className="p-2 border rounded">
 											<p className="text-sm">{comment.content}</p>
-											<p className="text-xs text-gray-500">Autor: {comment.author}</p>
-											<p className="text-xs text-gray-500">Data: {pipeDateTimeLabel(comment.createdAt as StatusEnum)}</p>
+											<p className="text-xs text-gray-500 font-semibold mt-2">{comment.author}</p>
+											<p className="text-xs text-gray-500">{pipeDateTimeLabel(comment.createdAt as StatusEnum)}</p>
 										</div>
 									))
 								)}
