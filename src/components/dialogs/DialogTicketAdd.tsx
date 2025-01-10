@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import IconComponet from '../IconComponet';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { addTicket } from '@/store/tickets/tickets-actions';
 import { AppDispatch } from '@/store';
 import { Button } from '../ui/button';
@@ -10,6 +10,7 @@ import { StatusEnum } from '@/enums/status.enum';
 import { useDispatch } from 'react-redux';
 import { useFormik } from 'formik';
 import { toast } from 'sonner';
+import { Textarea } from '../ui/textarea';
 
 const DialogAddTicket: React.FC = () => {
 	const dispatch = useDispatch<AppDispatch>();
@@ -42,10 +43,16 @@ const DialogAddTicket: React.FC = () => {
 		}
 	});
 
+	useEffect(() => {
+		if (isDialogOpen) {
+			formik.resetForm();
+		}
+	}, [isDialogOpen]);
+
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 			<DialogTrigger asChild>
-				<Button type="button" className="flex items-center gap-1">
+				<Button type="button" size={'sm'} className="flex items-center gap-1">
 					<IconComponet name="Plus" className="w-4 h-4" />
 					Ticket
 				</Button>
@@ -56,6 +63,20 @@ const DialogAddTicket: React.FC = () => {
 					<DialogDescription>Preencha os dados abaixo para adicionar um novo ticket.</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
+					<div>
+						<label htmlFor="author" className="block text-sm font-medium text-gray-700">
+							Autor
+						</label>
+						<Input
+							id="author"
+							name="author"
+							value={formik.values.author}
+							onChange={formik.handleChange}
+							onBlur={formik.handleBlur}
+							placeholder="Autor"
+						/>
+						{formik.touched.author && formik.errors.author ? <div className="text-red-500 text-xs ms-1">{formik.errors.author}</div> : null}
+					</div>
 					<div>
 						<label htmlFor="title" className="block text-sm font-medium text-gray-700">
 							Título
@@ -74,7 +95,7 @@ const DialogAddTicket: React.FC = () => {
 						<label htmlFor="description" className="block text-sm font-medium text-gray-700">
 							Descrição
 						</label>
-						<Input
+						<Textarea
 							id="description"
 							name="description"
 							value={formik.values.description}
@@ -85,20 +106,6 @@ const DialogAddTicket: React.FC = () => {
 						{formik.touched.description && formik.errors.description ? (
 							<div className="text-red-500 text-xs ms-1">{formik.errors.description}</div>
 						) : null}
-					</div>
-					<div>
-						<label htmlFor="author" className="block text-sm font-medium text-gray-700">
-							Autor
-						</label>
-						<Input
-							id="author"
-							name="author"
-							value={formik.values.author}
-							onChange={formik.handleChange}
-							onBlur={formik.handleBlur}
-							placeholder="Autor"
-						/>
-						{formik.touched.author && formik.errors.author ? <div className="text-red-500 text-xs ms-1">{formik.errors.author}</div> : null}
 					</div>
 					<DialogFooter className="gap-4 sm:gap-2 flex max-sm:flex-col-reverse">
 						<DialogClose asChild>
