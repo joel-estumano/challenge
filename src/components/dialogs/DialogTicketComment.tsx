@@ -28,6 +28,7 @@ interface IComment {
 const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [comments, setComments] = useState<IComment[]>([]);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -37,11 +38,14 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 	}, [isOpen]);
 
 	const fetchComments = async () => {
+		setIsLoading(true);
 		try {
 			const response = await api.get(`/ticket-comments?ticket=${ticket._id}`);
 			setComments(response.data.docs);
 		} catch (error) {
 			console.error('Failed to fetch comments:', error);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -141,8 +145,10 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 						<div>
 							<DialogTitle className="max-sm:text-center">Comentários</DialogTitle>
 							<div className="mt-2 flex flex-col flex-grow space-y-2 overflow-y-auto h-[300px] border rounded p-1">
-								{comments.length === 0 ? (
-									<p className="text-center py-4">Nada por aqui</p>
+								{isLoading ? (
+									<p className="text-center py-4 text-xs">Carregando...</p>
+								) : comments.length === 0 ? (
+									<p className="text-center py-4 text-xs">Nada por aqui</p>
 								) : (
 									comments.map((comment) => (
 										<div key={comment._id} className="p-2 border rounded">
