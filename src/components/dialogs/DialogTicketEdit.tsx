@@ -13,6 +13,7 @@ import { StatusEnum } from '@/enums/status.enum';
 import { toast } from 'sonner';
 import { useDispatch } from 'react-redux';
 import { useFormik } from 'formik';
+import { Textarea } from '../ui/textarea';
 
 interface DialogTicketEditProps {
 	ticket: ITicket;
@@ -76,6 +77,20 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 				</DialogHeader>
 				<form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
 					<div>
+						<label htmlFor="author" className="block text-sm font-medium text-gray-700">
+							Autor
+						</label>
+						<Input
+							id="author"
+							name="author"
+							value={formik.values.author}
+							onChange={formik.handleChange}
+							onBlur={formik.handleBlur}
+							placeholder="Autor"
+						/>
+						{formik.touched.author && formik.errors.author ? <div className="text-red-500 text-xs ms-1">{formik.errors.author}</div> : null}
+					</div>
+					<div>
 						<label htmlFor="title" className="block text-sm font-medium text-gray-700">
 							Título
 						</label>
@@ -93,31 +108,17 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 						<label htmlFor="description" className="block text-sm font-medium text-gray-700">
 							Descrição
 						</label>
-						<Input
+						<Textarea
 							id="description"
 							name="description"
 							value={formik.values.description}
 							onChange={formik.handleChange}
 							onBlur={formik.handleBlur}
-							placeholder="Descrição"
+							placeholder="Autor"
 						/>
 						{formik.touched.description && formik.errors.description ? (
 							<div className="text-red-500 text-xs ms-1">{formik.errors.description}</div>
 						) : null}
-					</div>
-					<div>
-						<label htmlFor="author" className="block text-sm font-medium text-gray-700">
-							Autor
-						</label>
-						<Input
-							id="author"
-							name="author"
-							value={formik.values.author}
-							onChange={formik.handleChange}
-							onBlur={formik.handleBlur}
-							placeholder="Autor"
-						/>
-						{formik.touched.author && formik.errors.author ? <div className="text-red-500 text-xs ms-1">{formik.errors.author}</div> : null}
 					</div>
 					<div>
 						<label className="block text-sm font-medium text-gray-700">Status</label>

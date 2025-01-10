@@ -1,4 +1,3 @@
-import DialogTicketAdd from '../../components/dialogs/DialogTicketAdd';
 import DialogTicketComment from '../../components/dialogs/DialogTicketComment';
 import DialogTicketConfirmDelete from '../../components/dialogs/DialogTicketConfirmDelete';
 import DialogTicketEdit from '../../components/dialogs/DialogTicketEdit';
@@ -59,8 +58,6 @@ const Dashboard: React.FC = () => {
 									<SelectFilterComponet />
 									{isLoading && <IconComponet name="RefreshCw" className="w-4 h-4 animate-spin text-secondary" />}
 								</div>
-
-								<DialogTicketAdd />
 							</div>
 
 							{isMobile ? (
