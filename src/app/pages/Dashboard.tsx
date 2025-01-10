@@ -44,7 +44,7 @@ const Dashboard: React.FC = () => {
 
 	if (error) return <p>Error: {error}</p>;
 
-	const noTicketsMessage = <p className="text-center py-4">Nada por aqui</p>;
+	const noTicketsMessage = <p className="text-center max-sm:py-4">{isLoading ? 'Carregando...' : 'Nada por aqui'}</p>;
 
 	return (
 		<div className="flex flex-col w-full max-h-screen overflow-hidden min-h-svh bg-gradient-to-r from-surface to-background">
@@ -121,7 +121,7 @@ const Dashboard: React.FC = () => {
 											{data.docs.length === 0 ? (
 												<TableRow>
 													<TableCell colSpan={5} className="text-center py-4">
-														Nada por aqui
+														{noTicketsMessage}
 													</TableCell>
 												</TableRow>
 											) : (
