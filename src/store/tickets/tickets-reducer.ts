@@ -45,18 +45,6 @@ const initialState: TicketsState = {
 };
 
 const ticketsReducer = createReducer(initialState, (builder) => {
-	// const localSort = (state: TicketsState) => {
-	// 	const filteredAndSortedTickets = state.data.docs
-	// 		.filter((ticket): ticket is ITicket & { updatedAt: string } => ticket.updatedAt !== undefined)
-	// 		.sort((a, b) => {
-	// 			const dateA = new Date(a.updatedAt).getTime();
-	// 			const dateB = new Date(b.updatedAt).getTime();
-	// 			return dateB - dateA;
-	// 		});
-	// 	state.data.docs = filteredAndSortedTickets;
-	// 	state.data.totalDocs = filteredAndSortedTickets.length;
-	// };
-
 	builder
 		// Load tickets
 		.addCase(loadTickets, (state) => {
