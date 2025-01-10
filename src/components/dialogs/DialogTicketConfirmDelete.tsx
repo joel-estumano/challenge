@@ -55,7 +55,7 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({ ticket }) => 
 						</div>
 						<div className="mt-2">
 							<label htmlFor="ticketAuthor" className="block text-sm font-medium text-gray-700">
-								Autor
+								Criador
 							</label>
 							<DialogDescription id="ticketAuthor">{ticket.author}</DialogDescription>
 						</div>

@@ -34,7 +34,7 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 		validationSchema: Yup.object({
 			title: Yup.string().required('Título é obrigatório'),
 			description: Yup.string().required('Descrição é obrigatória'),
-			author: Yup.string().required('Autor é obrigatório')
+			author: Yup.string().required('Criador é obrigatório')
 		}),
 		onSubmit: async (values, { setSubmitting, resetForm }) => {
 			try {
@@ -78,7 +78,7 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 				<form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
 					<div>
 						<label htmlFor="author" className="block text-sm font-medium text-gray-700">
-							Autor
+							Criador
 						</label>
 						<Input
 							id="author"
@@ -86,7 +86,7 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 							value={formik.values.author}
 							onChange={formik.handleChange}
 							onBlur={formik.handleBlur}
-							placeholder="Autor"
+							placeholder="Criador"
 						/>
 						{formik.touched.author && formik.errors.author ? <div className="text-red-500 text-xs ms-1">{formik.errors.author}</div> : null}
 					</div>
@@ -114,7 +114,7 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 							value={formik.values.description}
 							onChange={formik.handleChange}
 							onBlur={formik.handleBlur}
-							placeholder="Autor"
+							placeholder="Criador"
 						/>
 						{formik.touched.description && formik.errors.description ? (
 							<div className="text-red-500 text-xs ms-1">{formik.errors.description}</div>

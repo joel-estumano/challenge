@@ -26,7 +26,7 @@ const DialogAddTicket: React.FC = () => {
 		validationSchema: Yup.object({
 			title: Yup.string().required('Título é obrigatório'),
 			description: Yup.string().required('Descrição é obrigatória'),
-			author: Yup.string().required('Autor é obrigatório')
+			author: Yup.string().required('Criador é obrigatório')
 		}),
 		onSubmit: async (values, { setSubmitting, resetForm }) => {
 			try {
@@ -65,7 +65,7 @@ const DialogAddTicket: React.FC = () => {
 				<form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
 					<div>
 						<label htmlFor="author" className="block text-sm font-medium text-gray-700">
-							Autor
+							Criador
 						</label>
 						<Input
 							id="author"
@@ -73,7 +73,7 @@ const DialogAddTicket: React.FC = () => {
 							value={formik.values.author}
 							onChange={formik.handleChange}
 							onBlur={formik.handleBlur}
-							placeholder="Autor"
+							placeholder="Criador"
 						/>
 						{formik.touched.author && formik.errors.author ? <div className="text-red-500 text-xs ms-1">{formik.errors.author}</div> : null}
 					</div>
