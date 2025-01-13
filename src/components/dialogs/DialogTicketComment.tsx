@@ -67,11 +67,19 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 			if (user) {
 				setSubmitting(true);
 				try {
-					const response = await api.post('/comments', {
-						ticket: ticket._id,
-						content: values.newComment,
-						user: user.sub
-					});
+					const response = await api.post(
+						'/comments',
+						{
+							ticket: ticket._id,
+							content: values.newComment,
+							user: user.sub
+						},
+						{
+							params: {
+								pagination: false
+							}
+						}
+					);
 
 					setComments((prevComments) => [response.data, ...prevComments]);
 					resetForm();
