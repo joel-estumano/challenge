@@ -78,7 +78,7 @@ const Login: React.FC = () => {
 							) : null}
 						</div>
 						<Button type="submit" title="Login" disabled={formik.isSubmitting || !formik.isValid}>
-							{formik.isSubmitting ? 'Entrando...' : 'Login'}
+							{formik.isSubmitting ? 'Logando...' : 'Login'}
 						</Button>
 						<Link className="w-fit mx-auto" href="/create-account">
 							Criar Conta
