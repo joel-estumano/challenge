@@ -1,43 +1,51 @@
+'use client';
 import * as Yup from 'yup';
-import IconComponet from '../IconComponet';
+import IconComponet from '../IconComponent';
 import React, { useEffect, useState } from 'react';
 import { addTicket } from '@/store/tickets/tickets-actions';
-import { AppDispatch } from '@/store';
+import { AppDispatch, RootState } from '@/store';
 import { Button } from '../ui/button';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
 import { Input } from '../ui/input';
 import { StatusEnum } from '@/enums/status.enum';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useFormik } from 'formik';
 import { toast } from 'sonner';
 import { Textarea } from '../ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { getInitials } from '@/utils';
+import { ITicket } from '@/interfaces';
 
 const DialogAddTicket: React.FC = () => {
 	const dispatch = useDispatch<AppDispatch>();
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const status = StatusEnum.OPEN;
+	const user = useSelector((state: RootState) => state.user.data);
 
 	const formik = useFormik({
 		initialValues: {
 			title: '',
-			description: '',
-			author: ''
+			description: ''
 		},
 		validationSchema: Yup.object({
 			title: Yup.string().required('Título é obrigatório'),
-			description: Yup.string().required('Descrição é obrigatória'),
-			author: Yup.string().required('Criador é obrigatório')
+			description: Yup.string().required('Descrição é obrigatória')
 		}),
 		onSubmit: async (values, { setSubmitting, resetForm }) => {
-			try {
-				await dispatch(addTicket({ ...values, status }));
-				toast.success('Ticket adicionado com sucesso!');
-				resetForm();
-				setIsDialogOpen(false);
-			} catch (error) {
-				console.error(error);
-				toast.error('Erro ao adicionar o ticket.');
-			} finally {
+			if (user) {
+				await dispatch(addTicket({ ...values, status, user: user.sub } as unknown as ITicket))
+					.unwrap() // Desembrulha a ação para obter o valor real ou lança o erro
+					.then(() => {
+						toast.success('Ticket adicionado com sucesso!');
+						resetForm();
+						setIsDialogOpen(false);
+					})
+					.catch((error) => {
+						toast.error(`Erro ao adicionar o ticket: ${error}`);
+					})
+					.finally(() => setSubmitting(false));
+			} else {
+				toast.error('Erro: Usuário não autenticado.');
 				setSubmitting(false);
 			}
 		}
@@ -63,19 +71,12 @@ const DialogAddTicket: React.FC = () => {
 					<DialogDescription>Preencha os dados abaixo para adicionar um novo ticket.</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-					<div>
-						<label htmlFor="author" className="block text-sm font-medium text-gray-700">
-							Criador
-						</label>
-						<Input
-							id="author"
-							name="author"
-							value={formik.values.author}
-							onChange={formik.handleChange}
-							onBlur={formik.handleBlur}
-							placeholder="Criador"
-						/>
-						{formik.touched.author && formik.errors.author ? <div className="text-red-500 text-xs ms-1">{formik.errors.author}</div> : null}
+					<div className="flex items-center gap-2 max-sm:justify-center">
+						<Avatar>
+							<AvatarImage src={user?.avatarUrl || ''} />
+							<AvatarFallback>{user ? getInitials(user.name) : '?'}</AvatarFallback>
+						</Avatar>
+						<span>{user ? user.name : 'Usuário não autenticado'}</span>
 					</div>
 					<div>
 						<label htmlFor="title" className="block text-sm font-medium text-gray-700">

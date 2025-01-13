@@ -1,16 +1,18 @@
+import * as Yup from 'yup';
 import api from '@/services/api';
 import React, { ReactNode, useState, useEffect } from 'react';
+import { RootState } from '@/store';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
-import { Input } from '../ui/input';
+import { getInitials, pipeDateTimeLabel, pipeStatusLabel, styleStatusVariant } from '@/utils';
 import { ITicket } from '@/interfaces';
-import { pipeDateTimeLabel, pipeStatusLabel, styleStatusVariant } from '@/utils';
 import { StatusEnum } from '@/enums/status.enum';
 import { Textarea } from '../ui/textarea';
 import { toast } from 'sonner';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import { useSelector } from 'react-redux';
 
 interface DetailsDialogProps {
 	ticket: ITicket;
@@ -21,7 +23,11 @@ interface IComment {
 	_id: string;
 	ticketId: string;
 	content: string;
-	author: string;
+	user: {
+		_id: string;
+		name: string;
+		avatarUrl?: string;
+	};
 	createdAt: string;
 }
 
@@ -30,6 +36,7 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 	const [comments, setComments] = useState<IComment[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
+	const user = useSelector((state: RootState) => state.user.data);
 
 	useEffect(() => {
 		if (isOpen) {
@@ -40,7 +47,7 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 	const fetchComments = async () => {
 		setIsLoading(true);
 		try {
-			const response = await api.get(`/ticket-comments?ticket=${ticket._id}`);
+			const response = await api.get(`/comments?ticket=${ticket._id}`);
 			setComments(response.data.docs);
 		} catch (error) {
 			console.error('Failed to fetch comments:', error);
@@ -51,31 +58,34 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 
 	const formik = useFormik({
 		initialValues: {
-			newComment: '',
-			newAuthor: ''
+			newComment: ''
 		},
 		validationSchema: Yup.object({
-			newComment: Yup.string().required('O comentário não pode estar vazio.'),
-			newAuthor: Yup.string().required('O nome do criador não pode estar vazio.')
+			newComment: Yup.string().required('O comentário não pode estar vazio.')
 		}),
 		onSubmit: async (values, { setSubmitting, resetForm }) => {
-			setSubmitting(true);
-			try {
-				const response = await api.post('/ticket-comments', {
-					ticket: ticket._id,
-					content: values.newComment,
-					author: values.newAuthor
-				});
+			if (user) {
+				setSubmitting(true);
+				try {
+					const response = await api.post('/comments', {
+						ticket: ticket._id,
+						content: values.newComment,
+						user: user.sub
+					});
 
-				setComments((prevComments) => [response.data, ...prevComments]);
-				resetForm();
-				setError(null);
-				toast.success('Comentário adicionado com sucesso!');
-			} catch (error) {
-				console.error('Failed to add comment:', error);
-				setError('Falha ao adicionar o comentário.');
-				toast.error('Erro ao adicionar o comentário');
-			} finally {
+					setComments((prevComments) => [response.data, ...prevComments]);
+					resetForm();
+					setError(null);
+					toast.success('Comentário adicionado com sucesso!');
+				} catch (error) {
+					console.error('Failed to add comment:', error);
+					setError('Falha ao adicionar o comentário.');
+					toast.error('Erro ao adicionar o comentário');
+				} finally {
+					setSubmitting(false);
+				}
+			} else {
+				toast.error('Usuário não autenticado.');
 				setSubmitting(false);
 			}
 		}
@@ -113,7 +123,13 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 								<label htmlFor="ticketAuthor" className="block text-sm font-medium text-gray-700">
 									Criador
 								</label>
-								<DialogDescription id="ticketAuthor">{ticket.author}</DialogDescription>
+								<div className="flex items-center gap-2 max-sm:justify-center">
+									<Avatar>
+										<AvatarImage src={ticket.user?.avatarUrl || ''} />
+										<AvatarFallback>{ticket.user ? getInitials(ticket.user.name) : '?'}</AvatarFallback>
+									</Avatar>
+									<span>{ticket.user ? ticket.user.name : 'Usuário não autenticado'}</span>
+								</div>
 							</div>
 							<div className="mt-2">
 								<label htmlFor="ticketTitle" className="block text-sm font-medium text-gray-700">
@@ -153,30 +169,22 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 									comments.map((comment) => (
 										<div key={comment._id} className="p-2 border rounded">
 											<p className="text-sm">{comment.content}</p>
-											<p className="text-xs text-gray-500 font-semibold mt-2">{comment.author}</p>
-											<p className="text-xs text-gray-500">{pipeDateTimeLabel(comment.createdAt as StatusEnum)}</p>
+											<div className="flex items-center gap-2 mt-2">
+												<Avatar>
+													<AvatarImage src={comment.user.avatarUrl || ''} />
+													<AvatarFallback>{comment.user ? getInitials(comment.user.name) : '?'}</AvatarFallback>
+												</Avatar>
+												<div className="flex flex-col">
+													<span className="text-xs text-gray-500 font-semibold">{comment.user.name}</span>
+													<span className="text-xs text-gray-500 ">{pipeDateTimeLabel(comment.createdAt as StatusEnum)}</span>
+												</div>
+											</div>
 										</div>
 									))
 								)}
 							</div>
 						</div>
 						<form onSubmit={formik.handleSubmit} className="flex flex-col gap-4 mt-4">
-							<div>
-								<label htmlFor="newAuthor" className="block text-sm font-medium text-gray-700">
-									Seu nome
-								</label>
-								<Input
-									id="newAuthor"
-									name="newAuthor"
-									value={formik.values.newAuthor}
-									onChange={formik.handleChange}
-									onBlur={formik.handleBlur}
-									placeholder="Seu nome"
-								/>
-								{formik.touched.newAuthor && formik.errors.newAuthor ? (
-									<div className="text-red-500 text-xs ms-1">{formik.errors.newAuthor}</div>
-								) : null}
-							</div>
 							<div>
 								<label htmlFor="newComment" className="block text-sm font-medium text-gray-700">
 									Adicionar um comentário

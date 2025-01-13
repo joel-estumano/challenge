@@ -17,11 +17,13 @@ const SelectFilterComponet: React.FC = () => {
 	};
 
 	return (
-		<div className="flex gap-2 max-sm:justify-between items-center">
-			<p className="font-semibold">Filtrar por status:</p>
-			<div className="flex gap-2 items-center">
+		<div className="flex gap-2 sm:justify-between items-center  w-full">
+			<div className="w-fit ">
+				<p className="font-semibold text-nowrap">Filtrar por status:</p>
+			</div>
+			<div className="flex gap-2 items-center w-full">
 				<Select name="status" value={selectedStatus} onValueChange={(value: StatusEnum) => handleApplyFilter(value)}>
-					<SelectTrigger className="w-36">
+					<SelectTrigger className="w-36 max-sm:w-full">
 						<SelectValue placeholder="Status" />
 					</SelectTrigger>
 					<SelectContent>

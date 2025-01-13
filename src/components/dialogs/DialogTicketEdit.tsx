@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import IconComponet from '../IconComponet';
+import IconComponet from '../IconComponent';
 import React, { useEffect, useState } from 'react';
 import { AppDispatch } from '@/store';
 import { Button } from '../ui/button';
@@ -7,13 +7,14 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, Dialo
 import { editTicket } from '@/store/tickets/tickets-actions';
 import { Input } from '../ui/input';
 import { ITicket } from '@/interfaces';
-import { pipeStatusLabel } from '@/utils';
+import { getInitials, pipeStatusLabel } from '@/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { StatusEnum } from '@/enums/status.enum';
 import { toast } from 'sonner';
 import { useDispatch } from 'react-redux';
 import { useFormik } from 'formik';
 import { Textarea } from '../ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 interface DialogTicketEditProps {
 	ticket: ITicket;
@@ -28,36 +29,34 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 		initialValues: {
 			title: ticket.title,
 			description: ticket.description,
-			author: ticket.author,
 			status: ticket.status
 		},
 		validationSchema: Yup.object({
 			title: Yup.string().required('Título é obrigatório'),
-			description: Yup.string().required('Descrição é obrigatória'),
-			author: Yup.string().required('Criador é obrigatório')
+			description: Yup.string().required('Descrição é obrigatória')
 		}),
 		onSubmit: async (values, { setSubmitting, resetForm }) => {
-			try {
-				await dispatch(editTicket({ ...ticket, ...values }));
-				toast.success('Ticket atualizado com sucesso!');
-				resetForm();
-				setIsDialogOpen(false);
-			} catch (error) {
-				console.error(error);
-				toast.error('Erro ao atualizar o ticket.');
-			} finally {
-				setSubmitting(false);
-			}
+			const { user, ...ticketWithoutUser } = ticket;
+			await dispatch(editTicket({ ...ticketWithoutUser, ...values }))
+				.unwrap() // Desembrulha a ação para obter o valor real ou lançar o erro
+				.then(() => {
+					toast.success('Ticket atualizado com sucesso!');
+					resetForm();
+					setIsDialogOpen(false);
+				})
+				.catch((error) => {
+					console.error(error);
+					toast.error(`Erro ao atualizar o ticket: ${error}`);
+				})
+				.finally(() => setSubmitting(false));
 		}
 	});
 
 	useEffect(() => {
-		// Reinicializa o formulário sempre que o diálogo é aberto
 		if (isDialogOpen) {
 			formik.setValues({
 				title: ticket.title,
 				description: ticket.description,
-				author: ticket.author,
 				status: ticket.status
 			});
 		}
@@ -76,19 +75,12 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 					<DialogDescription>Atualize os dados abaixo para editar o ticket.</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-					<div>
-						<label htmlFor="author" className="block text-sm font-medium text-gray-700">
-							Criador
-						</label>
-						<Input
-							id="author"
-							name="author"
-							value={formik.values.author}
-							onChange={formik.handleChange}
-							onBlur={formik.handleBlur}
-							placeholder="Criador"
-						/>
-						{formik.touched.author && formik.errors.author ? <div className="text-red-500 text-xs ms-1">{formik.errors.author}</div> : null}
+					<div className="flex items-center gap-2 max-sm:justify-center">
+						<Avatar>
+							<AvatarImage src={ticket.user?.avatarUrl || ''} />
+							<AvatarFallback>{ticket.user ? getInitials(ticket.user.name) : '?'}</AvatarFallback>
+						</Avatar>
+						<span>{ticket.user ? ticket.user.name : 'Usuário não autenticado'}</span>
 					</div>
 					<div>
 						<label htmlFor="title" className="block text-sm font-medium text-gray-700">
@@ -114,7 +106,7 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 							value={formik.values.description}
 							onChange={formik.handleChange}
 							onBlur={formik.handleBlur}
-							placeholder="Criador"
+							placeholder="Descrição"
 						/>
 						{formik.touched.description && formik.errors.description ? (
 							<div className="text-red-500 text-xs ms-1">{formik.errors.description}</div>
