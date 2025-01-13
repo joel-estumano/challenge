@@ -8,6 +8,7 @@ import { editTicket } from '@/store/tickets/tickets-actions';
 import { StatusEnum } from '@/enums/status.enum';
 import { pipeStatusLabel } from '@/utils';
 import { ITicket } from '@/interfaces';
+import { toast } from 'sonner';
 
 interface DropdownUpdateStatusComponentProps {
 	ticket: ITicket;
@@ -21,9 +22,17 @@ const DropdownUpdateStatusComponent: React.FC<DropdownUpdateStatusComponentProps
 
 	const handleUpdateStatus = async () => {
 		setLoading(true);
-		await dispatch(editTicket({ ...ticket, status }));
-		setLoading(false);
-		setIsPopoverOpen(false);
+		await dispatch(editTicket({ ...ticket, status }))
+			.unwrap()
+			.then(() => {
+				toast.success('Ticket atualizado com sucesso!');
+				setIsPopoverOpen(false);
+			})
+			.catch((error) => {
+				console.error(error);
+				toast.error(`Erro ao atualizar o ticket: ${error}`);
+			})
+			.finally(() => setLoading(false));
 	};
 
 	return (

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
+import IconComponent from '@/components/IconComponent';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { authService } from '@/services/login-service';
@@ -13,7 +14,7 @@ const NavbarComponent: React.FC = () => {
 	return (
 		<nav className="sticky top-0 w-full block bg-black">
 			<div className="flex justify-between items-center w-full h-12 max-w-screen-xl px-16 mx-auto max-sm:px-4 xl:px-8">
-				<h1 className="lg:text-1xl xl:text-2xl font-bold">Gerenciador de Tickets</h1>
+				<h1 className="lg:text-1xl xl:text-2xl font-bold">G-Tickets</h1>
 				<div className="flex flex-row gap-4 items-center">
 					<DropdownMenu>
 						<DropdownMenuTrigger className="rounded-full">
@@ -26,14 +27,21 @@ const NavbarComponent: React.FC = () => {
 							<DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem>
-								<Link href="/create-account">Criar Conta</Link>
+								<Link className="flex items-center w-full text-start gap-2" href="/create-account">
+									<IconComponent name="UserPlus2" className="w-4 h-4" />
+									<span>Criar Conta</span>
+								</Link>
 							</DropdownMenuItem>
 							<DropdownMenuItem>
-								<Link href="/login">Fazer Login</Link>
+								<Link className="flex items-center w-full text-start gap-2" href="/login">
+									<IconComponent name="LogIn" className="w-4 h-4" />
+									<span>Fazer Login</span>
+								</Link>
 							</DropdownMenuItem>
 							<DropdownMenuItem>
-								<button title="Logout" className="w-full text-start" onClick={() => authService.logout()}>
-									Logout
+								<button title="Logout" className="flex items-center w-full text-start gap-2" onClick={() => authService.logout()}>
+									<IconComponent name="LogOut" className="w-4 h-4" />
+									<span>Logout</span>
 								</button>
 							</DropdownMenuItem>
 						</DropdownMenuContent>
