@@ -3,7 +3,7 @@ import ClientWrapper from './ClientWrapper';
 import type { Metadata } from 'next';
 import { Poppins, Montserrat } from 'next/font/google';
 import { Providers } from './Providers';
-import { Toaster } from 'sonner';
+import { useBreakpoint } from '@/components/context/breakpoint';
 
 const poppins = Poppins({
 	weight: '400',
@@ -27,10 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 		<html lang="pt-BR">
 			<body className={`${poppins.variable} ${montserrat.variable} antialiased`}>
 				<Providers>
-					<ClientWrapper>
-						{children}
-						<Toaster />
-					</ClientWrapper>
+					<ClientWrapper>{children}</ClientWrapper>
 				</Providers>
 			</body>
 		</html>

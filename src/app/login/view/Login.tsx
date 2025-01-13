@@ -33,7 +33,7 @@ const Login: React.FC = () => {
 					router.push('/');
 				})
 				.catch(() => {
-					toast.error('Unauthorized');
+					toast.error('Unauthorized!');
 				})
 				.finally(() => setSubmitting(false));
 		}
