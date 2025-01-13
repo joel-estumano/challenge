@@ -33,9 +33,9 @@ export const filterTickets = createAsyncThunk('tickets/filterTickets', async (st
 		const statusParams = status === StatusEnum.ALL ? [StatusEnum.OPEN, StatusEnum.PROGRESS, StatusEnum.DONE] : [status];
 		const response = await api.get(`/tickets?`, {
 			params: {
-				pagination: true,
+				pagination: false,
 				page: 1,
-				limit: 1,
+				limit: 10,
 				status: statusParams
 			}
 		});
