@@ -32,7 +32,7 @@ Este projeto é uma aplicação completa que permite aos usuários gerenciar tic
 3. Configure as variáveis de ambiente:
     - Crie um arquivo `.env` na raiz do projeto e adicione a variável:
         ```env
-        NEXT_PUBLIC_API_URL=https://dev-joel-estumano-api.onrender.com
+        NEXT_PUBLIC_API_URL=https://https://je-tickets-api.onrender.com
         ```
 
 4. Execute a aplicação em desenvolvimento:
