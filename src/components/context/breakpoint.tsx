@@ -1,50 +1,37 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+'use client';
+
+import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 
 interface BreakpointContextProps {
 	isMobile: boolean;
 }
 
-const BreakpointContext = createContext<BreakpointContextProps>({ isMobile: false });
+interface BreakpointProviderProps {
+	children: ReactNode;
+}
 
-/**
- * Provedor de contexto de breakpoint.
- *
- * Este componente provê o estado de `isMobile` para seus descendentes, detectando
- * quando o viewport está abaixo de 640px.
- *
- * @param {Object} props - Propriedades do componente.
- * @param {React.ReactNode} props.children - Componentes filhos que terão acesso ao contexto.
- * @returns {JSX.Element} O provedor de contexto.
- */
-export const BreakpointProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const BreakpointContext = createContext<BreakpointContextProps | undefined>(undefined);
+
+export const BreakpointProvider: React.FC<BreakpointProviderProps> = ({ children }) => {
 	const [isMobile, setIsMobile] = useState(false);
 
 	useEffect(() => {
-		const mediaQuery = window.matchMedia('(max-width: 639px)');
-
-		const handleMediaQueryChange = (event: MediaQueryListEvent) => {
-			setIsMobile(event.matches);
+		const handleResize = () => {
+			setIsMobile(window.innerWidth <= 768);
 		};
+		handleResize();
+		window.addEventListener('resize', handleResize);
 
-		mediaQuery.addEventListener('change', handleMediaQueryChange);
-
-		// Inicialmente
-		setIsMobile(mediaQuery.matches);
-
-		return () => {
-			mediaQuery.removeEventListener('change', handleMediaQueryChange);
-		};
+		return () => window.removeEventListener('resize', handleResize);
 	}, []);
 
 	return <BreakpointContext.Provider value={{ isMobile }}>{children}</BreakpointContext.Provider>;
 };
 
-/**
- * Hook para acessar o contexto de breakpoint.
- *
- * Este hook permite que qualquer componente consuma o estado de `isMobile`
- * fornecido pelo `BreakpointProvider`.
- *
- * @returns {BreakpointContextProps} O estado de `isMobile`.
- */
-export const useBreakpoint = () => useContext(BreakpointContext);
+export const useBreakpoint = () => {
+	const context = useContext(BreakpointContext);
+	if (!context) {
+		throw new Error('useBreakpoint must be used within a BreakpointProvider');
+	}
+	return context;
+};

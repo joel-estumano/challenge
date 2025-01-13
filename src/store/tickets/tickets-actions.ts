@@ -1,25 +1,30 @@
 import api from '@/services/api';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { handleApiError } from '@/utils';
-import { ITicket, TicketsPaginatedResult } from '@/interfaces';
+import { ITicket, ITicketsPaginatedResult } from '@/interfaces';
 import { StatusEnum } from '@/enums/status.enum';
 
 export const addTicketSuccess = createAction<{ ticket: ITicket }>('ADD_TICKET_SUCCESS');
 export const addTicketError = createAction<{ error: string }>('ADD_TICKET_ERROR');
 export const addTicketLoading = createAction('ADD_TICKET_LOADING');
-export const addTicket = createAsyncThunk('tickets/addTicket', async (ticket: ITicket, { dispatch }) => {
-	try {
-		dispatch(addTicketLoading());
-		const response = await api.post('/tickets', ticket);
-		dispatch(addTicketSuccess({ ticket: response.data }));
-	} catch (error) {
-		dispatch(addTicketError({ error: handleApiError(error) }));
-	}
+export const addTicket = createAsyncThunk('tickets/addTicket', async (ticket: ITicket, { dispatch, rejectWithValue }) => {
+	dispatch(addTicketLoading());
+	return api
+		.post('/tickets', ticket)
+		.then((response) => {
+			dispatch(addTicketSuccess({ ticket: response.data }));
+			return response.data;
+		})
+		.catch((error) => {
+			const handledError = handleApiError(error);
+			dispatch(addTicketError({ error: handledError }));
+			return rejectWithValue(handledError);
+		});
 });
 
 export const loadTickets = createAction<number>('LOAD_TICKETS');
 
-export const filterTicketsSuccess = createAction<{ data: TicketsPaginatedResult; status: StatusEnum[] }>('FILTER_TICKETS_SUCCESS');
+export const filterTicketsSuccess = createAction<{ data: ITicketsPaginatedResult; status: StatusEnum[] }>('FILTER_TICKETS_SUCCESS');
 export const filterTicketsError = createAction<{ error: string }>('FILTER_TICKETS_ERROR');
 export const filterTicketsLoading = createAction('FILTER_TICKETS_LOADING');
 export const filterTickets = createAsyncThunk('tickets/filterTickets', async (status: StatusEnum, { dispatch }) => {
@@ -28,9 +33,9 @@ export const filterTickets = createAsyncThunk('tickets/filterTickets', async (st
 		const statusParams = status === StatusEnum.ALL ? [StatusEnum.OPEN, StatusEnum.PROGRESS, StatusEnum.DONE] : [status];
 		const response = await api.get(`/tickets?`, {
 			params: {
-				pagination: false,
+				pagination: true,
 				page: 1,
-				limit: 10,
+				limit: 1,
 				status: statusParams
 			}
 		});

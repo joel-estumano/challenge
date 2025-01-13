@@ -1,14 +1,16 @@
-import IconComponet from '@/components/IconComponet';
+import IconComponet from '@/components/IconComponent';
 import React, { useState } from 'react';
 import { AppDispatch, RootState } from '@/store';
 import { Button } from '../ui/button';
 import { deleteTicket } from '@/store/tickets/tickets-actions';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { ITicket } from '@/interfaces';
 import { pipeDateTimeLabel } from '@/utils';
 import { StatusEnum } from '@/enums/status.enum';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { getInitials } from '@/utils';
 
 interface ConfirmDeleteDialogProps {
 	ticket: ITicket;
@@ -20,15 +22,16 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({ ticket }) => 
 	const [isOpen, setIsOpen] = useState(false);
 
 	const handleConfirm = async () => {
-		try {
-			await dispatch(deleteTicket(ticket._id as string));
-			toast.success('Ticket excluído com sucesso!');
-		} catch (error) {
-			console.error(error);
-			toast.error('Erro ao excluir o ticket.');
-		} finally {
-			setIsOpen(false);
-		}
+		await dispatch(deleteTicket(ticket._id as string))
+			.unwrap() // Desembrulha a ação para obter o valor real ou lançar o erro
+			.then(() => {
+				toast.success('Ticket excluído com sucesso!');
+				setIsOpen(false);
+			})
+			.catch((error) => {
+				console.error(error);
+				toast.error('Erro ao excluir o ticket.');
+			});
 	};
 
 	return (
@@ -57,7 +60,13 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({ ticket }) => 
 							<label htmlFor="ticketAuthor" className="block text-sm font-medium text-gray-700">
 								Criador
 							</label>
-							<DialogDescription id="ticketAuthor">{ticket.author}</DialogDescription>
+							<div className="flex items-center gap-2 max-sm:justify-center">
+								<Avatar>
+									<AvatarImage src={ticket.user?.avatarUrl || ''} />
+									<AvatarFallback>{ticket.user ? getInitials(ticket.user.name) : '?'}</AvatarFallback>
+								</Avatar>
+								<span>{ticket.user ? ticket.user.name : 'Usuário não autenticado'}</span>
+							</div>
 						</div>
 						<div className="mt-2">
 							<label htmlFor="ticketTitle" className="block text-sm font-medium text-gray-700">
@@ -72,14 +81,14 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({ ticket }) => 
 							<DialogDescription id="ticketUpdated">{pipeDateTimeLabel(ticket.updatedAt as StatusEnum)}</DialogDescription>
 						</div>
 					</DialogHeader>
-					<div className="mt-4 flex justify-end space-x-2">
+					<DialogFooter className="gap-4 sm:gap-2 flex max-sm:flex-col-reverse">
 						<Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
 							Cancelar
 						</Button>
 						<Button type="button" variant="destructive" onClick={handleConfirm} disabled={isLoading}>
 							{isLoading ? 'Excluindo...' : 'Confirmar'}
 						</Button>
-					</div>
+					</DialogFooter>
 				</DialogContent>
 			</Dialog>
 		</>

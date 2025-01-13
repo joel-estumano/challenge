@@ -22,7 +22,8 @@ const eslintConfig = [
 		files: ['**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx'],
 		ignores: ['node_modules/'],
 		rules: {
-			'prettier/prettier': ['error', {}, { usePrettierrc: true }]
+			'prettier/prettier': ['error', {}, { usePrettierrc: true }],
+			'@typescript-eslint/no-unused-vars': 'off'
 		},
 		languageOptions: {
 			parserOptions: {
