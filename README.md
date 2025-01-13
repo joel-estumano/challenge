@@ -20,8 +20,8 @@ Este projeto é uma aplicação completa que permite aos usuários gerenciar tic
 ### Instalação e Configuração
 1. Clone o repositório:
     ```bash
-    git clone <URL_DO_REPOSITORIO>
-    cd <NOME_DO_REPOSITORIO>
+    git clone https://github.com/joel-estumano/challenge.git
+    cd challenge
     ```
 
 2. Instale as dependências:
@@ -40,6 +40,8 @@ Este projeto é uma aplicação completa que permite aos usuários gerenciar tic
     npm run dev
     ```
 
+    **Aviso**: Ao iniciar a aplicação, pode ocorrer um pequeno atraso no carregamento dos dados. Isso acontece porque o servidor pode estar em modo de espera (dormência) e necessita de um tempo para ativar e processar a solicitação.
+
 5. Acesse a aplicação em seu navegador em `http://localhost:3000`.
 
 ### Deploy
@@ -56,5 +58,3 @@ Este projeto foi desenvolvido por Joel Estumano. Se tiver alguma dúvida ou suge
 
 ### Licença
 Este projeto é licenciado sob a [MIT License](LICENSE).
-
----
