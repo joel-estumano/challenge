@@ -22,28 +22,11 @@ export const addTicket = createAsyncThunk('tickets/addTicket', async (ticket: IT
 		});
 });
 
-export const loadTickets = createAction<number>('LOAD_TICKETS');
+export const loadTickets = createAction<{ page: number; statusFilter: StatusEnum }>('LOAD_TICKETS');
 
-export const filterTicketsSuccess = createAction<{ data: ITicketsPaginatedResult; status: StatusEnum[] }>('FILTER_TICKETS_SUCCESS');
-export const filterTicketsError = createAction<{ error: string }>('FILTER_TICKETS_ERROR');
-export const filterTicketsLoading = createAction('FILTER_TICKETS_LOADING');
-export const filterTickets = createAsyncThunk('tickets/filterTickets', async (status: StatusEnum, { dispatch }) => {
-	try {
-		dispatch(filterTicketsLoading());
-		const statusParams = status === StatusEnum.ALL ? [StatusEnum.OPEN, StatusEnum.PROGRESS, StatusEnum.DONE] : [status];
-		const response = await api.get(`/tickets?`, {
-			params: {
-				pagination: false,
-				page: 1,
-				limit: 10,
-				status: statusParams
-			}
-		});
-		dispatch(filterTicketsSuccess({ data: response.data, status: [status] }));
-	} catch (error) {
-		dispatch(filterTicketsError({ error: handleApiError(error) }));
-	}
-});
+export const loadTicketsSuccess = createAction<{ data: ITicketsPaginatedResult; statusFilter: StatusEnum }>('LOAD_TICKETS_SUCCESS');
+export const loadTicketsError = createAction<{ error: string }>('LOAD_TICKETS_ERROR');
+export const loadTicketsLoading = createAction('LOAD_TICKETS_LOADING');
 
 export const editTicketSuccess = createAction<{ ticket: ITicket }>('EDIT_TICKET_SUCCESS');
 export const editTicketError = createAction<{ error: string }>('EDIT_TICKET_ERROR');

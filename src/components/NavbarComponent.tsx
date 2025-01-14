@@ -3,10 +3,10 @@ import React from 'react';
 import IconComponent from '@/components/IconComponent';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
-import { authService } from '@/services/login-service';
+import { authService } from '@/services/auth-service';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
-import { getInitials } from '@/utils';
+import { pipeInitialsUserName } from '@/utils';
 
 const NavbarComponent: React.FC = () => {
 	const user = useSelector((state: RootState) => state.user.data);
@@ -20,7 +20,7 @@ const NavbarComponent: React.FC = () => {
 						<DropdownMenuTrigger className="rounded-full">
 							<Avatar>
 								<AvatarImage src={user?.avatarUrl || ''} />
-								<AvatarFallback>{user ? getInitials(user.name) : '?'}</AvatarFallback>
+								<AvatarFallback>{user ? pipeInitialsUserName(user.name) : '?'}</AvatarFallback>
 							</Avatar>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent>

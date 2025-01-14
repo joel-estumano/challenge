@@ -1,9 +1,11 @@
-import { ITicketsPaginatedResult } from './tickets-paginated-result.interface';
+import { StatusEnum } from '@/enums/status.enum';
+import { ITicket } from './ticket.interface';
 
 export interface ITicketsState {
-	data: ITicketsPaginatedResult;
+	tickets: ITicket[];
+	page: number;
+	hasNextPage: boolean;
+	statusFilter: StatusEnum;
 	isLoading: boolean;
 	error: string | null;
-	page: number;
-	hasMore: boolean;
 }

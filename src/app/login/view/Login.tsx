@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
-import { authService } from '@/services/login-service';
+import { authService } from '@/services/auth-service';
 import { fetchUserRequest } from '@/store/user/user-actions';
 
 const Login: React.FC = () => {

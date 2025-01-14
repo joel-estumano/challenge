@@ -13,7 +13,7 @@ import { useFormik } from 'formik';
 import { toast } from 'sonner';
 import { Textarea } from '../ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { getInitials } from '@/utils';
+import { pipeInitialsUserName } from '@/utils';
 import { ITicket } from '@/interfaces';
 
 const DialogAddTicket: React.FC = () => {
@@ -74,7 +74,7 @@ const DialogAddTicket: React.FC = () => {
 					<div className="flex items-center gap-2 max-sm:justify-center">
 						<Avatar>
 							<AvatarImage src={user?.avatarUrl || ''} />
-							<AvatarFallback>{user ? getInitials(user.name) : '?'}</AvatarFallback>
+							<AvatarFallback>{user ? pipeInitialsUserName(user.name) : '?'}</AvatarFallback>
 						</Avatar>
 						<span>{user ? user.name : 'Usuário não autenticado'}</span>
 					</div>

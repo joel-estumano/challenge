@@ -1,6 +1,6 @@
 import { put, takeLatest } from 'redux-saga/effects';
 import { fetchUserRequest, fetchUserSuccess, fetchUserFailure } from './user-actions';
-import { authService } from '@/services/login-service';
+import { authService } from '@/services/auth-service';
 import { handleApiError } from '@/utils';
 
 function* fetchUser() {

@@ -3,7 +3,7 @@ import * as Yup from 'yup';
 import Link from 'next/link';
 import React from 'react';
 import SectionComponent from '@/components/SectionComponent';
-import { authService } from '@/services/login-service';
+import { authService } from '@/services/auth-service';
 import { Button } from '@/components/ui/button';
 import { fetchUserRequest } from '@/store/user/user-actions';
 import { Input } from '@/components/ui/input';

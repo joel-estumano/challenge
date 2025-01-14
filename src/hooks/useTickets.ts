@@ -1,23 +1,22 @@
-import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { loadTickets } from '@/store/tickets/tickets-actions';
 import { RootState, AppDispatch } from '@/store';
-import { filterTickets, loadTickets } from '@/store/tickets/tickets-actions';
-import { StatusEnum } from '@/enums/status.enum';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
 export const useTickets = (inView: boolean) => {
 	const dispatch = useDispatch<AppDispatch>();
-	const { data, isLoading, error, hasMore } = useSelector((state: RootState) => state.tickets);
-	const [page] = useState(1);
+
+	const { tickets, page, hasNextPage, statusFilter, isLoading, error } = useSelector((state: RootState) => state.tickets);
 
 	useEffect(() => {
-		dispatch(filterTickets(StatusEnum.ALL));
+		dispatch(loadTickets({ page: page, statusFilter }));
 	}, [dispatch]);
 
 	useEffect(() => {
-		if (inView && hasMore && !isLoading && !error) {
-			dispatch(loadTickets(page));
+		if (inView && hasNextPage && !isLoading && !error) {
+			dispatch(loadTickets({ page: page + 1, statusFilter }));
 		}
-	}, [inView, hasMore, isLoading, dispatch, page]);
+	}, [tickets, page, hasNextPage, statusFilter, isLoading, error, inView, dispatch]);
 
-	return { data, isLoading, error, page, hasMore };
+	return { tickets, isLoading, error };
 };

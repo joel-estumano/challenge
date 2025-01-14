@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
-import { AppDispatch } from '../store';
-import { filterTickets } from '../store/tickets/tickets-actions';
+import { AppDispatch, RootState } from '../store';
+import { loadTickets } from '../store/tickets/tickets-actions';
 import { pipeStatusLabel } from '@/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { StatusEnum } from '@/enums/status.enum';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const SelectFilterComponet: React.FC = () => {
+	const { statusFilter } = useSelector((state: RootState) => state.tickets);
+	const [selectedStatus, setselectedStatus] = useState<StatusEnum>(statusFilter);
+
 	const dispatch = useDispatch<AppDispatch>();
 
-	const [selectedStatus, setselectedStatus] = useState<StatusEnum>(StatusEnum.ALL);
-
-	const handleApplyFilter = (value: StatusEnum) => {
-		setselectedStatus(value);
-		dispatch(filterTickets(value));
+	const handleApplyFilter = (status: StatusEnum) => {
+		setselectedStatus(status);
+		dispatch(loadTickets({ page: 1, statusFilter: status }));
 	};
 
 	return (
