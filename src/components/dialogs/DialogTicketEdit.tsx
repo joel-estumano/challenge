@@ -7,7 +7,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, Dialo
 import { editTicket } from '@/store/tickets/tickets-actions';
 import { Input } from '../ui/input';
 import { ITicket } from '@/interfaces';
-import { getInitials, pipeStatusLabel } from '@/utils';
+import { pipeInitialsUserName, pipeStatusLabel } from '@/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { StatusEnum } from '@/enums/status.enum';
 import { toast } from 'sonner';
@@ -78,7 +78,7 @@ const DialogTicketEdit: React.FC<DialogTicketEditProps> = ({ ticket }) => {
 					<div className="flex items-center gap-2 max-sm:justify-center">
 						<Avatar>
 							<AvatarImage src={ticket.user?.avatarUrl || ''} />
-							<AvatarFallback>{ticket.user ? getInitials(ticket.user.name) : '?'}</AvatarFallback>
+							<AvatarFallback>{ticket.user ? pipeInitialsUserName(ticket.user.name) : '?'}</AvatarFallback>
 						</Avatar>
 						<span>{ticket.user ? ticket.user.name : 'Usuário não autenticado'}</span>
 					</div>

@@ -23,9 +23,8 @@ import { useTickets } from '@/hooks/useTickets';
 
 const Dashboard: React.FC = () => {
 	const { isMobile } = useBreakpoint();
-	const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: false });
-	const { data, isLoading, error } = useTickets(inView);
-
+	const { ref, inView } = useInView({ threshold: 1, triggerOnce: false });
+	const { tickets, isLoading, error } = useTickets(inView);
 	const message = error ? error : isLoading ? 'Carregando...' : 'Nada por aqui';
 
 	return (
@@ -44,11 +43,11 @@ const Dashboard: React.FC = () => {
 							</div>
 
 							{isMobile ? (
-								<Accordion ref={ref} type="single" collapsible className="w-full">
-									{data.docs.length === 0 ? (
+								<Accordion type="single" collapsible className="w-full">
+									{tickets.length === 0 ? (
 										<p className="text-center max-sm:py-4">{message}</p>
 									) : (
-										data.docs.map((ticket: ITicket) => (
+										tickets.map((ticket: ITicket) => (
 											<AccordionItem value={ticket._id as string} key={ticket._id}>
 												<AccordionTrigger>
 													<div className="flex gap-3 pe-2 w-full">
@@ -92,7 +91,7 @@ const Dashboard: React.FC = () => {
 								</Accordion>
 							) : (
 								<div>
-									<Table ref={ref} className="min-w-full h-full">
+									<Table className="min-w-full h-full">
 										<TableHeader>
 											<TableRow>
 												<TableHead className="w-1/12 px-2 py-2 text-xs sm:text-sm">ID</TableHead>
@@ -103,14 +102,14 @@ const Dashboard: React.FC = () => {
 											</TableRow>
 										</TableHeader>
 										<TableBody>
-											{data.docs.length === 0 ? (
+											{tickets.length === 0 ? (
 												<TableRow>
 													<TableCell colSpan={5} className="text-center py-4">
 														<p className="text-center max-sm:py-4">{message}</p>
 													</TableCell>
 												</TableRow>
 											) : (
-												data.docs.map((ticket: ITicket) => (
+												tickets.map((ticket: ITicket) => (
 													<TableRow key={ticket._id}>
 														<TableCell className="px-2 py-2 text-xs sm:text-sm">
 															<TooltipProvider>
@@ -159,6 +158,8 @@ const Dashboard: React.FC = () => {
 									</Table>
 								</div>
 							)}
+							<div ref={ref} className="h-1 invisible"></div>
+							{/* div para controle de auto carregamento */}
 						</SectionComponent>
 					</div>
 				</div>

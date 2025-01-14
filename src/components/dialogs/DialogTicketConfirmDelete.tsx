@@ -10,7 +10,7 @@ import { StatusEnum } from '@/enums/status.enum';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getInitials } from '@/utils';
+import { pipeInitialsUserName } from '@/utils';
 
 interface ConfirmDeleteDialogProps {
 	ticket: ITicket;
@@ -63,7 +63,7 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({ ticket }) => 
 							<div className="flex items-center gap-2 max-sm:justify-center">
 								<Avatar>
 									<AvatarImage src={ticket.user?.avatarUrl || ''} />
-									<AvatarFallback>{ticket.user ? getInitials(ticket.user.name) : '?'}</AvatarFallback>
+									<AvatarFallback>{ticket.user ? pipeInitialsUserName(ticket.user.name) : '?'}</AvatarFallback>
 								</Avatar>
 								<span>{ticket.user ? ticket.user.name : 'Usuário não autenticado'}</span>
 							</div>

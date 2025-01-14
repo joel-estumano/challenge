@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
-import { getInitials, pipeDateTimeLabel, pipeStatusLabel, styleStatusVariant } from '@/utils';
+import { pipeInitialsUserName, pipeDateTimeLabel, pipeStatusLabel, styleStatusVariant } from '@/utils';
 import { ITicket } from '@/interfaces';
 import { StatusEnum } from '@/enums/status.enum';
 import { Textarea } from '../ui/textarea';
@@ -134,7 +134,7 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 								<div className="flex items-center gap-2 max-sm:justify-center">
 									<Avatar>
 										<AvatarImage src={ticket.user?.avatarUrl || ''} />
-										<AvatarFallback>{ticket.user ? getInitials(ticket.user.name) : '?'}</AvatarFallback>
+										<AvatarFallback>{ticket.user ? pipeInitialsUserName(ticket.user.name) : '?'}</AvatarFallback>
 									</Avatar>
 									<span>{ticket.user ? ticket.user.name : 'Usuário não autenticado'}</span>
 								</div>
@@ -180,7 +180,7 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ ticket, children }) => {
 											<div className="flex items-center gap-2 mt-2">
 												<Avatar>
 													<AvatarImage src={comment.user.avatarUrl || ''} />
-													<AvatarFallback>{comment.user ? getInitials(comment.user.name) : '?'}</AvatarFallback>
+													<AvatarFallback>{comment.user ? pipeInitialsUserName(comment.user.name) : '?'}</AvatarFallback>
 												</Avatar>
 												<div className="flex flex-col">
 													<span className="text-xs text-gray-500 font-semibold">{comment.user.name}</span>

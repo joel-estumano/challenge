@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { authService } from './login-service';
+import { authService } from './auth-service';
 
 // Cria uma instância do axios com configuração personalizada
 const api = axios.create({
@@ -12,7 +12,7 @@ const api = axios.create({
 // Intercepta todas as requisições para adicionar o token de autenticação
 api.interceptors.request.use(
 	(request) => {
-		console.log('Starting Request', request); // Loga a requisição para fins de depuração
+		// console.log('Starting Request', request); // Loga a requisição para fins de depuração
 		if (request.headers) {
 			request.headers.Authorization = `Bearer ${authService.getToken()}`; // Adiciona o token de autenticação nos cabeçalhos
 		}
@@ -26,11 +26,11 @@ api.interceptors.request.use(
 // Intercepta todas as respostas para tratar erros específicos
 api.interceptors.response.use(
 	(response) => {
-		console.log('Response:', response); // Loga a resposta para fins de depuração
+		// console.log('Response:', response); // Loga a resposta para fins de depuração
 		return response; // Retorna a resposta de sucesso
 	},
 	(error) => {
-		console.log('Error Response:', error.response); // Loga a resposta de erro para fins de depuração
+		// console.log('Error Response:', error.response); // Loga a resposta de erro para fins de depuração
 		if (error?.response?.status === 401) {
 			// Se o status da resposta for 401 (não autorizado)
 			authService.logout(); // Realiza logout do usuário

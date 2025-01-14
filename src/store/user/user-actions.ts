@@ -1,6 +1,6 @@
 import { IUser } from '@/interfaces';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { authService } from '@/services/login-service';
+import { authService } from '@/services/auth-service';
 
 export const fetchUserRequest = createAction('FETCH_USER_REQUEST');
 export const fetchUserSuccess = createAction<IUser>('FETCH_USER_SUCCESS');

@@ -1,12 +1,12 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { ITicketsPaginatedResult } from '@/interfaces/tickets-paginated-result.interface';
+import { ITicketsState } from '@/interfaces';
 import {
 	addTicketSuccess,
 	addTicketError,
 	addTicketLoading,
-	filterTicketsSuccess,
-	filterTicketsError,
-	filterTicketsLoading,
+	loadTicketsSuccess,
+	loadTicketsError,
+	loadTicketsLoading,
 	deleteTicketSuccess,
 	deleteTicketError,
 	deleteTicketLoading,
@@ -17,31 +17,13 @@ import {
 } from './tickets-actions';
 import { StatusEnum } from '@/enums/status.enum';
 
-interface TicketsState {
-	data: ITicketsPaginatedResult;
-	isLoading: boolean;
-	error: string | null;
-	page: number;
-	hasMore: boolean;
-}
-
-const initialState: TicketsState = {
-	data: {
-		docs: [],
-		totalDocs: 0,
-		limit: 10,
-		totalPages: 0,
-		page: 1,
-		pagingCounter: 1,
-		hasPrevPage: false,
-		hasNextPage: false,
-		prevPage: null,
-		nextPage: null
-	},
-	isLoading: false,
-	error: null,
+const initialState: ITicketsState = {
+	tickets: [],
 	page: 1,
-	hasMore: true
+	hasNextPage: false,
+	statusFilter: StatusEnum.ALL,
+	isLoading: false,
+	error: null
 };
 
 const ticketsReducer = createReducer(initialState, (builder) => {
@@ -54,8 +36,7 @@ const ticketsReducer = createReducer(initialState, (builder) => {
 			state.isLoading = true;
 		})
 		.addCase(addTicketSuccess, (state, action) => {
-			state.data.docs = [action.payload.ticket, ...state.data.docs];
-			state.data.totalDocs += 1;
+			state.tickets = [action.payload.ticket, ...state.tickets];
 			state.isLoading = false;
 		})
 		.addCase(addTicketError, (state, action) => {
@@ -67,9 +48,9 @@ const ticketsReducer = createReducer(initialState, (builder) => {
 			state.isLoading = true;
 		})
 		.addCase(editTicketSuccess, (state, action) => {
-			const index = state.data.docs.findIndex((ticket) => ticket._id === action.payload.ticket._id);
+			const index = state.tickets.findIndex((ticket) => ticket._id === action.payload.ticket._id);
 			if (index !== -1) {
-				state.data.docs[index] = action.payload.ticket;
+				state.tickets[index] = action.payload.ticket;
 			}
 			state.isLoading = false;
 		})
@@ -82,8 +63,7 @@ const ticketsReducer = createReducer(initialState, (builder) => {
 			state.isLoading = true;
 		})
 		.addCase(deleteTicketSuccess, (state, action) => {
-			state.data.docs = state.data.docs.filter((ticket) => ticket._id !== action.payload.id);
-			state.data.totalDocs -= 1;
+			state.tickets = state.tickets.filter((ticket) => ticket._id !== action.payload.id);
 			state.isLoading = false;
 		})
 		.addCase(deleteTicketError, (state, action) => {
@@ -91,31 +71,18 @@ const ticketsReducer = createReducer(initialState, (builder) => {
 			state.error = action.payload.error;
 		})
 		// Filter tickets (API call)
-		.addCase(filterTicketsLoading, (state) => {
+		.addCase(loadTicketsLoading, (state) => {
 			state.isLoading = true;
 		})
-		.addCase(filterTicketsSuccess, (state, action) => {
+		.addCase(loadTicketsSuccess, (state, action) => {
+			const { data, statusFilter } = action.payload;
+			state.page = data.page;
+			state.hasNextPage = data.hasNextPage;
+			state.statusFilter = statusFilter;
+			state.tickets = data.page === 1 ? data.docs : (state.tickets = [...state.tickets, ...data.docs]);
 			state.isLoading = false;
-			const { data, status } = action.payload;
-			const newTickets = data.docs;
-			const combinedTickets = [...state.data.docs.filter((doc) => status.includes(doc.status as StatusEnum)), ...newTickets].filter(
-				(ticket, index, self) => index === self.findIndex((t) => t._id === ticket._id)
-			);
-			state.data.docs = combinedTickets;
-			state.data.totalDocs = combinedTickets.length;
-			state.data.totalDocs = data.totalDocs;
-			state.data.limit = data.limit;
-			state.data.totalPages = data.totalPages;
-			state.data.page = data.page;
-			state.data.pagingCounter = data.pagingCounter;
-			state.data.hasPrevPage = data.hasPrevPage;
-			state.data.hasNextPage = data.hasNextPage;
-			state.data.prevPage = data.prevPage;
-			state.data.nextPage = data.nextPage;
-			state.page = data.page + 1;
-			state.hasMore = data.hasNextPage;
 		})
-		.addCase(filterTicketsError, (state, action) => {
+		.addCase(loadTicketsError, (state, action) => {
 			state.isLoading = false;
 			state.error = action.payload.error;
 		});
